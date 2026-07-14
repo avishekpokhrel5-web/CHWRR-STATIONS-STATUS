@@ -389,6 +389,105 @@ table.sum-month tfoot td{background:#dce7f0;border-top:1px solid #b0c4d8;
 .dl-menu-months .dl-menu-item .mi-label{color:#374151;}
 .dl-no-data{color:#c4d4e3!important;}
 
+/* ── MODEM INVENTORY ── */
+.inv-wrap{padding:12px 14px}
+.inv-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #e2e8f0}
+.inv-info{font-size:11px;color:#64748b;flex:1;min-width:180px}
+.inv-toggle{display:flex;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden}
+.inv-tg{padding:6px 16px;font-size:12px;border:none;background:#fff;cursor:pointer;
+  color:#64748b;font-weight:bold;display:flex;align-items:center;gap:5px}
+.inv-tg:not(:last-child){border-right:1px solid #e2e8f0}
+.inv-tg:hover{background:#f1f5f9}
+.inv-tg.sat.active{background:#1d4ed8;color:#fff}
+.inv-tg.gsm.active{background:#15803d;color:#fff}
+.inv-filter{display:flex;align-items:center;gap:5px;font-size:11px;color:#475569;
+  cursor:pointer;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;padding:5px 10px}
+.inv-filter:hover{background:#f1f5f9}
+table.inv{border-collapse:collapse;width:100%;font-size:11px;min-width:1050px}
+table.inv th{background:#2b4d7c;color:#fff;padding:5px 6px;text-align:center;font-size:10px;
+  border-right:1px solid rgba(255,255,255,.15);white-space:nowrap;vertical-align:middle}
+table.inv th.grp-sat{background:#1e3a8a}
+table.inv th.grp-gsm{background:#14532d}
+table.inv th.grp-rc{background:#1a3558}
+table.inv td{padding:3px 5px;border-right:1px solid #e2e8f0;border-bottom:1px solid #f1f5f9;
+  font-size:11px;vertical-align:middle}
+table.inv tbody tr.inv-main:nth-child(4n+1) td{background:#f8fafc}
+table.inv td.c{text-align:center}
+.inv-inp{width:100%;min-width:70px;border:1px solid transparent;background:transparent;
+  font-size:11px;color:#1e293b;padding:3px 5px;border-radius:3px;outline:none}
+.inv-inp:hover{border-color:#dbeafe;background:#fff}
+.inv-inp:focus{border-color:#93c5fd;background:#fefce8}
+.inv-inp::placeholder{color:#c4cdd6;font-style:italic;font-size:10px}
+.inv-last{font-size:10px;color:#475569;white-space:nowrap}
+.inv-last .dim2{color:#94a3b8}
+.inv-badge{display:inline-block;font-size:9px;padding:1px 7px;border-radius:9px;
+  font-weight:bold;white-space:nowrap}
+.badge-ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.badge-warn{background:#fffbeb;color:#b45309;border:1px solid #fcd34d}
+.badge-exp{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5}
+.badge-none{background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;font-weight:normal;font-style:italic}
+.btn-rc-add{font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;
+  border:1px solid #93c5fd;background:#eff6ff;color:#1d4ed8;font-weight:bold;white-space:nowrap}
+.btn-rc-add:hover{background:#dbeafe}
+.btn-rc-hist{font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;
+  border:1px solid #d1d5db;background:#fff;color:#475569;white-space:nowrap}
+.btn-rc-hist:hover{background:#f1f5f9}
+.btn-rc-hist.open{background:#1a3558;color:#fff;border-color:#1a3558}
+.rc-form-row td{background:#eff6ff!important;padding:8px 10px!important;
+  border-bottom:2px solid #93c5fd!important}
+.rc-form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.rc-form .fld input{font-size:11px;padding:4px 7px;min-width:105px}
+.rc-form .btn-save{padding:5px 14px;background:#2563eb;color:#fff;border:none;
+  border-radius:4px;font-size:11px;cursor:pointer;font-weight:bold}
+.rc-form .btn-save:hover{background:#1d4ed8}
+.rc-form .btn-cancel{padding:5px 11px;background:#fff;color:#374151;border:1px solid #d1d5db;
+  border-radius:4px;font-size:11px;cursor:pointer}
+.rc-hist-row td{background:#fafbfc!important;padding:6px 10px 8px!important;
+  border-bottom:2px solid #cbd5e1!important}
+table.rc-hist{border-collapse:collapse;width:auto;min-width:640px;font-size:10px;
+  border:1px solid #e2e8f0;border-radius:4px}
+table.rc-hist th{background:#dce7f0;color:#1a3558;padding:3px 10px;font-size:9px;
+  text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #c4d4e3;text-align:left}
+table.rc-hist td{padding:3px 10px;border-bottom:1px solid #f1f5f9;font-size:10px;background:#fff}
+.rc-hist-lbl{font-size:9px;font-weight:bold;color:#64748b;text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:4px}
+.inv-empty{padding:30px;text-align:center;color:#94a3b8;font-style:italic;font-size:12px}
+
+/* ── RIVER WATCH SYNC ── */
+.rw-modal{background:#fff;border-radius:12px;width:860px;max-width:96vw;
+  box-shadow:0 12px 50px rgba(0,0,0,.3);overflow:hidden;display:flex;flex-direction:column;max-height:92vh}
+.rw-body{padding:14px 18px;overflow-y:auto}
+.rw-opts{display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px;margin-bottom:12px}
+.rw-opts label{display:flex;align-items:center;gap:5px;font-size:11px;color:#475569;cursor:pointer}
+.rw-opts select{font-size:11px;padding:3px 6px;border:1px solid #d1d5db;border-radius:4px}
+.rw-note{font-size:11px;color:#92400e;background:#fef9c3;border:1px solid #fbbf24;
+  border-radius:5px;padding:6px 10px;margin-bottom:10px;line-height:1.5}
+table.rw-tbl{width:100%;border-collapse:collapse;font-size:11px}
+table.rw-tbl th{background:#dce7f0;color:#1a3558;padding:5px 8px;font-size:10px;text-align:left;
+  border-bottom:1px solid #c4d4e3;position:sticky;top:0}
+table.rw-tbl td{padding:4px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+table.rw-tbl tbody tr:nth-child(even) td{background:#f8fafc}
+.rw-sel{width:100%;max-width:280px;font-size:11px;padding:3px 5px;
+  border:1px solid #d1d5db;border-radius:4px;background:#fff}
+.rw-prop{display:inline-block;font-size:10px;font-weight:bold;padding:1px 9px;border-radius:9px}
+.rw-prop.A{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.rw-prop.I{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5}
+.rw-prop.skip{background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;font-weight:normal;font-style:italic}
+.rw-lastdata{font-size:10px;color:#64748b;white-space:nowrap}
+.rw-sec-lbl{font-size:10px;font-weight:bold;color:#475569;text-transform:uppercase;
+  letter-spacing:.05em;margin:14px 0 6px}
+.rw-newlist{max-height:170px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px}
+.rw-new-row{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  padding:4px 10px;border-bottom:1px solid #f1f5f9;font-size:11px}
+.rw-new-row:nth-child(even){background:#f8fafc}
+.btn-rw-imp{font-size:10px;padding:2px 9px;border-radius:4px;cursor:pointer;
+  border:1px solid #86efac;background:#f0fdf4;color:#15803d;font-weight:bold;white-space:nowrap}
+.btn-rw-imp:hover{background:#dcfce7}
+.rw-loading{padding:40px;text-align:center;color:#64748b;font-size:13px}
+.rw-err{padding:24px;text-align:center;color:#dc2626;font-size:12px;line-height:1.6}
+
 /* ── PRINT ── */
 @media print{
   body{background:#fff;padding:4px}
@@ -616,6 +715,7 @@ var S={
   stns:{},status:{},
   showManage:false,showAddOff:false,showDelOff:false,showUserMgmt:false,
   view:"status",
+  invSide:"sat",invAddFor:null,invHistFor:null,invMatchOnly:false,invForm:{},
   newOff:"",newNo:"",newName:"",newElev:"",newType:"Manual+Automatic",newMed:"GSM",
   newUsr:{username:"",password:"",role:"dataentry",offices:{},subtypes:{}}
 };
@@ -1690,6 +1790,466 @@ function renderSummary(app){
 }
 
 /* ════════════════════════════════════════
+   RIVER WATCH SYNC (live DHM data via BIPAD open API)
+════════════════════════════════════════ */
+var RW_API="https://bipadportal.gov.np/api/v1/river/?format=json&limit=-1";
+
+function rwMapKey(){return "rls_rwmap_"+sk(S.office)+"_"+sk(S.subtype);}
+
+function rwFetch(cb){
+  // Try direct first; if browser CORS blocks it, fall back to public CORS proxies.
+  var tries=[
+    RW_API,
+    "https://api.allorigins.win/raw?url="+encodeURIComponent(RW_API),
+    "https://corsproxy.io/?url="+encodeURIComponent(RW_API)
+  ];
+  var i=0;
+  (function next(){
+    if(i>=tries.length){cb(null,"Could not reach the River Watch data feed. This can happen if the DHM/BIPAD server is down, or the network blocks it. Please try again later.");return;}
+    var u=tries[i++];
+    fetch(u,{method:"GET"})
+      .then(function(r){if(!r.ok)throw 0;return r.json();})
+      .then(function(j){
+        var list=(j&&(j.results||j.data))||(Array.isArray(j)?j:[]);
+        if(!Array.isArray(list)||list.length===0)throw 0;
+        var out=list.map(function(r){
+          var wl=r.waterLevel||r.water_level||null;
+          return{
+            id:r.id,
+            title:String(r.title||r.name||"").trim(),
+            basin:r.basin||"",
+            status:r.status||"",
+            value:(wl&&wl.value!=null)?wl.value:null,
+            when:(wl&&(wl.datetime||wl.dateTime||wl.date))||r.modifiedOn||r.createdOn||null
+          };
+        }).filter(function(x){return x.title;});
+        if(out.length===0)throw 0;
+        out.sort(function(a,b){return a.title<b.title?-1:1;});
+        cb(out,null);
+      })
+      .catch(function(){next();});
+  })();
+}
+
+/* fuzzy name matching between app stations and feed titles */
+function rwNorm(s){
+  return String(s||"").toLowerCase()
+    .replace(/\(.*?\)/g," ")
+    .replace(/[^a-z0-9 ]/g," ")
+    .replace(/\b(river|khola|nadi|nala|nadee|at|the|hs|rls|aws|station|bridge|gad|gaon|gau)\b/g," ")
+    .replace(/\s+/g," ").trim();
+}
+function rwScore(a,b){
+  if(!a||!b)return 0;
+  if(a===b)return 1;
+  if(a.indexOf(b)>=0||b.indexOf(a)>=0)return .85;
+  var ta=a.split(" "),tb=b.split(" "),hit=0;
+  ta.forEach(function(t){if(t.length>2&&tb.indexOf(t)>=0)hit++;});
+  return hit/Math.max(ta.length,tb.length);
+}
+function rwHoursAgo(iso){
+  if(!iso)return null;
+  var t=new Date(iso);
+  if(isNaN(t.getTime()))return null;
+  return (Date.now()-t.getTime())/3600000;
+}
+function rwFmtAgo(h){
+  if(h==null)return "no data";
+  if(h<1)return Math.round(h*60)+" min ago";
+  if(h<48)return Math.round(h)+" h ago";
+  return Math.round(h/24)+" d ago";
+}
+
+function openRiverWatchSync(){
+  var overlay=document.createElement("div");overlay.className="lock-modal-overlay";
+  var modal=document.createElement("div");modal.className="rw-modal";
+  var hdr=document.createElement("div");hdr.className="lock-modal-hdr";
+  hdr.innerHTML='<span class="icon">🌐</span><div><div class="ttl">River Watch Sync — live station status</div>'+
+    '<div class="sub">DHM real-time river data (via BIPAD open API) · '+S.office+' / '+S.subtype+'</div></div>';
+  var body=document.createElement("div");body.className="rw-body";
+  body.innerHTML='<div class="rw-loading">⏳ Fetching live data from River Watch feed…</div>';
+  var foot=document.createElement("div");foot.className="lock-modal-foot";
+  var closeB=document.createElement("button");closeB.className="btn-lock-cancel";closeB.textContent="Close";
+  closeB.onclick=function(){overlay.remove();};
+  foot.appendChild(closeB);
+  modal.appendChild(hdr);modal.appendChild(body);modal.appendChild(foot);
+  overlay.appendChild(modal);document.body.appendChild(overlay);
+  overlay.addEventListener("click",function(e){if(e.target===overlay)overlay.remove();});
+
+  rwFetch(function(feed,err){
+    if(!document.body.contains(overlay))return;
+    if(err){body.innerHTML='<div class="rw-err">⚠ '+err+'</div>';return;}
+    buildRwUI(feed);
+  });
+
+  function buildRwUI(feed){
+    body.innerHTML="";
+    var stns=S.stns[SK(S.office,S.subtype)]||[];
+    var savedMap=lGet(rwMapKey())||{};
+    var feedNorm=feed.map(function(f){return rwNorm(f.title);});
+    var now=new Date();
+    var realMonth=MONTHS[now.getMonth()],realYear=now.getFullYear(),realDay=now.getDate();
+
+    /* options bar */
+    var thSel=document.createElement("select");
+    [["6","≤ 6 hours"],["12","≤ 12 hours"],["24","≤ 24 hours"],["48","≤ 48 hours"]].forEach(function(o){
+      var op=document.createElement("option");op.value=o[0];op.textContent=o[1];
+      if(o[0]==="24")op.selected=true;thSel.appendChild(op);
+    });
+    var owChk=document.createElement("input");owChk.type="checkbox";
+    var opts=el("div",{cls:"rw-opts"},[
+      el("label",[txt("Mark Active if last data is "),thSel]),
+      el("label",[owChk,txt("Overwrite cells that already have a status")]),
+      el("span",{style:"font-size:11px;color:#64748b;margin-left:auto"},[feed.length+" stations live on River Watch"])
+    ]);
+    body.appendChild(opts);
+    body.appendChild(el("div",{cls:"rw-note"},[
+      "Will fill Day "+realDay+" of "+realMonth+" "+realYear+
+      (isMonthLocked(realMonth)&&S.year===realYear?" — ⚠ that month is LOCKED, unlock it first.":".")+
+      " Stations are auto-matched by name; correct any match below before applying. Your corrections are remembered for next time."
+    ]));
+
+    if(stns.length===0){
+      body.appendChild(el("div",{cls:"rw-err"},["No stations in your list yet for "+S.office+" / "+S.subtype+". Import some from the feed below, then run sync again."]));
+    }
+
+    /* per-station mapping table */
+    var rows=[];
+    var tbl=el("table",{cls:"rw-tbl"});
+    tbl.appendChild(el("thead",[el("tr",[
+      el("th",{style:"width:24px"},["✓"]),el("th",["Your Station"]),
+      el("th",["Match on River Watch"]),el("th",["Last Data"]),el("th",{style:"width:90px"},["Will Set"])
+    ])]));
+    var tb=el("tbody");
+    stns.forEach(function(stn){
+      var best=-1,bestSc=0;
+      var savedTitle=savedMap[stn.id];
+      if(savedTitle){
+        feed.forEach(function(f,fi){if(f.title===savedTitle)best=fi;});
+      }
+      if(best<0){
+        var n=rwNorm(stn.name);
+        feedNorm.forEach(function(fn,fi){var sc=rwScore(n,fn);if(sc>bestSc){bestSc=sc;best=fi;}});
+        if(bestSc<0.5)best=-1;
+      }
+      var inc=document.createElement("input");inc.type="checkbox";inc.checked=best>=0;
+      var sel=document.createElement("select");sel.className="rw-sel";
+      var opNone=document.createElement("option");opNone.value="-1";opNone.textContent="— not on River Watch —";
+      sel.appendChild(opNone);
+      feed.forEach(function(f,fi){
+        var op=document.createElement("option");op.value=String(fi);op.textContent=f.title;
+        if(fi===best)op.selected=true;sel.appendChild(op);
+      });
+      var lastTd=el("td",{cls:"rw-lastdata"});
+      var propTd=el("td");
+      var row={stn:stn,inc:inc,sel:sel,lastTd:lastTd,propTd:propTd};
+      rows.push(row);
+      sel.onchange=function(){inc.checked=parseInt(sel.value)>=0;refresh();};
+      inc.onchange=refresh;
+      tb.appendChild(el("tr",[
+        el("td",[inc]),
+        el("td",[el("b",[stn.no?stn.no+" ":""]) ,txt(stn.name)]),
+        el("td",[sel]),lastTd,propTd
+      ]));
+    });
+    tbl.appendChild(tb);
+    if(stns.length>0)body.appendChild(el("div",{style:"max-height:300px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px"},[tbl]));
+
+    function proposed(row){
+      var fi=parseInt(row.sel.value);
+      if(!row.inc.checked||fi<0)return null;
+      var h=rwHoursAgo(feed[fi].when);
+      return (h!=null&&h<=parseInt(thSel.value))?"A":"I";
+    }
+    function refresh(){
+      rows.forEach(function(row){
+        var fi=parseInt(row.sel.value);
+        row.lastTd.innerHTML="";
+        row.propTd.innerHTML="";
+        if(fi>=0){
+          var f=feed[fi],h=rwHoursAgo(f.when);
+          row.lastTd.appendChild(txt((f.value!=null?f.value+" m · ":"")+rwFmtAgo(h)));
+        }else row.lastTd.appendChild(el("span",{style:"color:#c4cdd6"},["—"]));
+        var p=proposed(row);
+        if(p)row.propTd.appendChild(el("span",{cls:"rw-prop "+p},[p==="A"?"A · Active":"I · Inactive"]));
+        else row.propTd.appendChild(el("span",{cls:"rw-prop skip"},["skip"]));
+      });
+    }
+    thSel.onchange=refresh;
+    refresh();
+
+    /* feed stations not matched to anything — importable */
+    var usedTitles={};
+    rows.forEach(function(r){var fi=parseInt(r.sel.value);if(fi>=0)usedTitles[feed[fi].title]=1;});
+    var unmatched=feed.filter(function(f){return !usedTitles[f.title];});
+    if(unmatched.length>0){
+      body.appendChild(el("div",{cls:"rw-sec-lbl"},["On River Watch but not in your station list ("+unmatched.length+") — import if needed"]));
+      var listDiv=el("div",{cls:"rw-newlist"});
+      unmatched.forEach(function(f){
+        (function(fs){
+          var impB=el("button",{cls:"btn-rw-imp",onclick:function(){
+            if(!AUTH.user){flash("You must be logged in.",true);return;}
+            var k2=SK(S.office,S.subtype);
+            var stn={id:"s"+Date.now()+Math.floor(Math.random()*1000),no:"",name:fs.title,elev:"",type:"Automatic",medium:"GSM"};
+            S.stns[k2]=(S.stns[k2]||[]).concat([stn]);lSet(k2,S.stns[k2]);
+            var mp=lGet(rwMapKey())||{};mp[stn.id]=fs.title;lSet(rwMapKey(),mp);
+            flash('Imported "'+fs.title+'" — reopen sync to include it');
+            this.disabled=true;this.textContent="✓ added";this.style.opacity=".5";
+          }},["＋ Add station"]);
+          listDiv.appendChild(el("div",{cls:"rw-new-row"},[
+            el("span",{style:"overflow:hidden;text-overflow:ellipsis;white-space:nowrap"},[fs.title+(fs.basin?"  ·  "+fs.basin:"")]),impB
+          ]));
+        })(f);
+      });
+      body.appendChild(listDiv);
+    }
+
+    /* apply button */
+    var applyB=document.createElement("button");
+    applyB.className="btn-lock-confirm";
+    applyB.textContent="✓ Apply Status for Day "+realDay+" ("+realMonth+")";
+    applyB.onclick=function(){
+      if(!AUTH.user){flash("You must be logged in.",true);return;}
+      if(S.year!==realYear){S.year=realYear;lSet("rls_year",realYear);S.status={};}
+      S.month=realMonth;
+      if(isMonthLocked(realMonth)){flash("🔒 "+realMonth+" "+realYear+" is locked. Ask admin to unlock first.",true);return;}
+      var k=TK(S.office,S.subtype,realMonth);
+      if(S.status[k]===undefined)S.status[k]=lGet(k)||{};
+      var mp=lGet(rwMapKey())||{};
+      var nA=0,nI=0,nSkip=0;
+      rows.forEach(function(row){
+        var fi=parseInt(row.sel.value);
+        mp[row.stn.id]=fi>=0?feed[fi].title:"";
+        var p=proposed(row);
+        if(!p){nSkip++;return;}
+        if(!S.status[k][row.stn.id])S.status[k][row.stn.id]={};
+        var existing=S.status[k][row.stn.id][realDay]||"";
+        if(existing&&!owChk.checked){nSkip++;return;}
+        S.status[k][row.stn.id][realDay]=p;
+        if(p==="A")nA++;else nI++;
+      });
+      lSet(k,S.status[k]);
+      lSet(rwMapKey(),mp);
+      overlay.remove();
+      flash("River Watch sync: "+nA+" Active, "+nI+" Inactive set for "+realMonth+" "+realDay+(nSkip?" · "+nSkip+" skipped":""));
+      render();
+    };
+    foot.insertBefore(applyB,closeB);
+  }
+}
+
+/* ════════════════════════════════════════
+   MODEM INVENTORY (Satellite / GSM)
+════════════════════════════════════════ */
+function invKey(){return "rls_inv_"+sk(S.office)+"_"+sk(S.subtype);}
+function getInvAll(){return lGet(invKey())||{};}
+function getInv(id){
+  var all=getInvAll();var d=all[id]||{};
+  if(!d.sat)d.sat={};if(!d.gsm)d.gsm={};
+  if(!d.satR)d.satR=[];if(!d.gsmR)d.gsmR=[];
+  return d;
+}
+function saveInv(id,d){var all=getInvAll();all[id]=d;lSet(invKey(),all);}
+function setInvField(id,side,field,val){
+  if(!AUTH.user){flash("You must be logged in to edit inventory.",true);return;}
+  var d=getInv(id);d[side][field]=val.trim();saveInv(id,d);
+}
+function saveRecharge(id,side){
+  if(!AUTH.user){flash("You must be logged in to add recharges.",true);return;}
+  var f=S.invForm||{};
+  if(!f.on&&!f.validity&&!f.volume&&!f.price&&!f.by){flash("Fill at least one recharge field",true);return;}
+  var d=getInv(id);
+  var arr=(side==="sat"?d.satR:d.gsmR);
+  arr.unshift({on:(f.on||"").trim(),validity:(f.validity||"").trim(),volume:(f.volume||"").trim(),
+    price:(f.price||"").trim(),by:(f.by||"").trim(),ts:Date.now()});
+  saveInv(id,d);
+  S.invAddFor=null;S.invForm={};
+  flash("Recharge entry saved");render();
+}
+function deleteRecharge(id,side,idx){
+  if(!AUTH.user){flash("You must be logged in.",true);return;}
+  if(!confirm("Delete this recharge entry?\n\nThis cannot be undone."))return;
+  var d=getInv(id);
+  (side==="sat"?d.satR:d.gsmR).splice(idx,1);
+  saveInv(id,d);flash("Recharge entry deleted");render();
+}
+function validityBadge(v){
+  if(!v)return el("span",{cls:"inv-badge badge-none"},["no recharge"]);
+  var dt=new Date(v);
+  if(isNaN(dt.getTime()))return el("span",{cls:"inv-badge badge-none"},[v]);
+  var days=Math.ceil((dt-new Date())/86400000);
+  if(days<0)return el("span",{cls:"inv-badge badge-exp",title:"Validity expired on "+v},["⛔ expired "+Math.abs(days)+"d"]);
+  if(days<=15)return el("span",{cls:"inv-badge badge-warn",title:"Validity ends "+v},["⚠ "+days+"d left"]);
+  return el("span",{cls:"inv-badge badge-ok",title:"Validity ends "+v},["✓ "+days+"d left"]);
+}
+function downloadInventoryCSV(){
+  var side=S.invSide,isSat=side==="sat";
+  var stns=S.stns[SK(S.office,S.subtype)]||[];
+  var hdr=["S.N.","Station No.","Station",isSat?"Modem Brand":"Modem Brand","Serial No.",
+    isSat?"FTI No.":"SIM No. (NTC / NCELL)","Recharge On","Validity","Data Volume","Price","Recharged By"];
+  var rows=[hdr];
+  stns.forEach(function(stn,i){
+    var d=getInv(stn.id),m=d[side],rc=isSat?d.satR:d.gsmR;
+    var base=[i+1,stn.no,stn.name,m.brand||"",m.serial||"",isSat?(m.fti||""):(m.sim||"")];
+    if(rc.length===0){rows.push(base.concat(["","","","",""]));}
+    else rc.forEach(function(r,j){
+      rows.push((j===0?base:["","","","","",""]).concat([r.on,r.validity,r.volume,r.price,r.by]));
+    });
+  });
+  var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
+  var a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
+  a.download=(isSat?"Satellite":"GSM")+"_Modem_Inventory_"+sk(S.office)+".csv";a.click();
+}
+
+function renderInventory(app){
+  var side=S.invSide,isSat=side==="sat";
+  var allStns=S.stns[SK(S.office,S.subtype)]||[];
+  var medWanted=isSat?"Satellite":"GSM";
+  var stns=S.invMatchOnly?allStns.filter(function(s){return s.medium===medWanted;}):allStns;
+  var wrap=el("div",{cls:"inv-wrap"});
+
+  /* toolbar */
+  var bar=el("div",{cls:"inv-bar"});
+  bar.appendChild(el("div",{cls:"inv-toggle"},[
+    el("button",{cls:"inv-tg sat"+(isSat?" active":""),onclick:function(){S.invSide="sat";S.invAddFor=null;S.invHistFor=null;render();}},["🛰 Satellite Modems"]),
+    el("button",{cls:"inv-tg gsm"+(!isSat?" active":""),onclick:function(){S.invSide="gsm";S.invAddFor=null;S.invHistFor=null;render();}},["📶 GSM Modems"])
+  ]));
+  var chk=el("input",{type:"checkbox"});chk.checked=S.invMatchOnly;
+  chk.onchange=function(){S.invMatchOnly=this.checked;render();};
+  bar.appendChild(el("label",{cls:"inv-filter"},[chk,txt("Only stations with medium = "+medWanted)]));
+  bar.appendChild(el("div",{cls:"inv-info"},[
+    txt((isSat?"Satellite":"GSM")+" modem & recharge register — "),el("b",[S.office]),txt(" / "),el("b",[S.subtype]),
+    txt(" · "+stns.length+" station"+(stns.length!==1?"s":""))
+  ]));
+  bar.appendChild(el("button",{cls:"btn-dl",onclick:downloadInventoryCSV},["⬇ Export CSV"]));
+  wrap.appendChild(bar);
+
+  if(stns.length===0){
+    wrap.appendChild(el("div",{cls:"inv-empty"},[
+      allStns.length===0
+        ?"No stations for "+S.office+" / "+S.subtype+". Open ⚙ Stations to add them first."
+        :"No stations with medium \""+medWanted+"\". Untick the filter to see all stations."
+    ]));
+    app.appendChild(wrap);return;
+  }
+
+  /* table */
+  var tbl=el("table",{cls:"inv"});
+  var gr=el("tr");
+  gr.appendChild(el("th",{colspan:"3"},[""]));
+  gr.appendChild(el("th",{cls:isSat?"grp-sat":"grp-gsm",colspan:"3"},[(isSat?"🛰 Satellite":"📶 GSM")+" Modem Information"]));
+  gr.appendChild(el("th",{cls:"grp-rc",colspan:"6"},[(isSat?"Satellite":"GSM")+" Recharge Info (latest)"]));
+  gr.appendChild(el("th",[""]));
+  var hr=el("tr");
+  [["#",""],["Stn No.",""],["Station / Name",""],["Brand",""],["Serial No.",""],
+   [isSat?"FTI No.":"SIM No. (NTC / NCELL)",""],
+   ["Recharged On",""],["Validity",""],["Status",""],["Data Volume",""],["Price",""],["Recharged By",""],["Actions",""]
+  ].forEach(function(h){hr.appendChild(el("th",[h[0]]));});
+  tbl.appendChild(el("thead",[gr,hr]));
+
+  var tbody=el("tbody");
+  stns.forEach(function(stn,i){
+    var d=getInv(stn.id),m=d[side];
+    var rc=isSat?d.satR:d.gsmR;
+    var last=rc[0]||null;
+    var tr=el("tr",{cls:"inv-main"});
+    tr.appendChild(el("td",{cls:"c",style:"color:#94a3b8"},[String(i+1)]));
+    tr.appendChild(el("td",{cls:"c",style:"font-family:monospace"},[stn.no]));
+    var nameTd=el("td",{style:"white-space:nowrap;max-width:210px;overflow:hidden;text-overflow:ellipsis",title:stn.name+" · medium: "+stn.medium},[stn.name]);
+    tr.appendChild(nameTd);
+
+    /* editable modem info */
+    [["brand","e.g. Hughes / Thuraya"],["serial","Serial number"],
+     [isSat?"fti":"sim",isSat?"FTI number":"NTC: 98… / NCELL: 98…"]].forEach(function(f){
+      (function(field,ph){
+        var inp=document.createElement("input");
+        inp.type="text";inp.className="inv-inp";inp.value=m[field]||"";inp.placeholder=ph;
+        inp.onchange=function(){setInvField(stn.id,side,field,this.value);};
+        tr.appendChild(el("td",[inp]));
+      })(f[0],f[1]);
+    });
+
+    /* latest recharge summary (read-only) */
+    tr.appendChild(el("td",{cls:"c inv-last"},[last&&last.on?last.on:el("span",{cls:"dim2"},["—"])]));
+    tr.appendChild(el("td",{cls:"c inv-last"},[last&&last.validity?last.validity:el("span",{cls:"dim2"},["—"])]));
+    tr.appendChild(el("td",{cls:"c"},[validityBadge(last?last.validity:"")]));
+    tr.appendChild(el("td",{cls:"c inv-last"},[last&&last.volume?last.volume:el("span",{cls:"dim2"},["—"])]));
+    tr.appendChild(el("td",{cls:"c inv-last"},[last&&last.price?last.price:el("span",{cls:"dim2"},["—"])]));
+    tr.appendChild(el("td",{cls:"c inv-last"},[last&&last.by?last.by:el("span",{cls:"dim2"},["—"])]));
+
+    /* actions */
+    var addOpen=S.invAddFor===stn.id,histOpen=S.invHistFor===stn.id;
+    tr.appendChild(el("td",{cls:"c",style:"white-space:nowrap"},[
+      el("button",{cls:"btn-rc-add",onclick:function(){
+        S.invAddFor=addOpen?null:stn.id;S.invHistFor=null;S.invForm={};render();
+      }},[addOpen?"✕ Cancel":"＋ Recharge"]),
+      txt(" "),
+      el("button",{cls:"btn-rc-hist"+(histOpen?" open":""),onclick:function(){
+        S.invHistFor=histOpen?null:stn.id;S.invAddFor=null;render();
+      },title:"Show recharge history"},["📜 "+rc.length])
+    ]));
+    tbody.appendChild(tr);
+
+    /* add-recharge inline form */
+    if(addOpen){
+      var ftr=el("tr",{cls:"rc-form-row"});
+      var ftd=el("td");ftd.setAttribute("colspan","13");
+      var mk=function(lbl,key,type,ph){
+        var inp=document.createElement("input");
+        inp.type=type;inp.placeholder=ph||"";
+        inp.value=S.invForm[key]||"";
+        inp.oninput=function(){S.invForm[key]=this.value;};
+        inp.onkeydown=function(e){if(e.key==="Enter")saveRecharge(stn.id,side);};
+        return el("div",{cls:"fld"},[el("label",[txt(lbl)]),inp]);
+      };
+      ftd.appendChild(el("div",{cls:"rc-form"},[
+        el("b",{style:"font-size:11px;color:#1d4ed8;margin-right:4px;align-self:center"},["New "+(isSat?"satellite":"GSM")+" recharge — "+stn.name+":"]),
+        mk("Recharged on","on","date"),
+        mk("Valid until","validity","date"),
+        mk("Data volume","volume","text","e.g. 5 GB / 90 days"),
+        mk("Price","price","text","e.g. NPR 4,500"),
+        mk("Recharged by","by","text","Name"),
+        el("button",{cls:"btn-save",onclick:function(){saveRecharge(stn.id,side);}},["✓ Save Entry"]),
+        el("button",{cls:"btn-cancel",onclick:function(){S.invAddFor=null;S.invForm={};render();}},["Cancel"])
+      ]));
+      ftr.appendChild(ftd);tbody.appendChild(ftr);
+    }
+
+    /* history */
+    if(histOpen){
+      var htr=el("tr",{cls:"rc-hist-row"});
+      var htd=el("td");htd.setAttribute("colspan","13");
+      htd.appendChild(el("div",{cls:"rc-hist-lbl"},["Recharge history — "+stn.name+" ("+rc.length+" entr"+(rc.length===1?"y":"ies")+", newest first)"]));
+      if(rc.length===0){
+        htd.appendChild(el("div",{style:"font-size:11px;color:#94a3b8;font-style:italic"},["No recharge entries yet. Use ＋ Recharge to add the first one."]));
+      }else{
+        var ht=el("table",{cls:"rc-hist"});
+        ht.appendChild(el("thead",[el("tr",[
+          el("th",["#"]),el("th",["Recharged On"]),el("th",["Validity"]),el("th",["Status"]),
+          el("th",["Data Volume"]),el("th",["Price"]),el("th",["Recharged By"]),el("th",[""])
+        ])]));
+        var hb=el("tbody");
+        rc.forEach(function(r,idx){
+          hb.appendChild(el("tr",[
+            el("td",{style:"color:#94a3b8"},[String(rc.length-idx)]),
+            el("td",[r.on||"—"]),el("td",[r.validity||"—"]),
+            el("td",[validityBadge(r.validity)]),
+            el("td",[r.volume||"—"]),el("td",[r.price||"—"]),el("td",[r.by||"—"]),
+            el("td",[el("button",{cls:"btn-rm",onclick:function(){deleteRecharge(stn.id,side,idx);}},["✕ delete"])])
+          ]));
+        });
+        ht.appendChild(hb);htd.appendChild(ht);
+      }
+      htr.appendChild(htd);tbody.appendChild(htr);
+    }
+  });
+  tbl.appendChild(tbody);
+  wrap.appendChild(el("div",{cls:"tbl-wrap"},[tbl]));
+  app.appendChild(wrap);
+}
+
+/* ════════════════════════════════════════
    MAIN RENDER
 ════════════════════════════════════════ */
 function render(){
@@ -1753,7 +2313,8 @@ function render(){
           ?el("button",{cls:"hdr-btn hdr-btn-locked",onclick:isAdmin?unlockMonth:function(){flash("Only Admin can unlock",true);}},["🔒 "+(isAdmin?"Click to Unlock":"Locked")])
           :el("button",{cls:"hdr-btn hdr-btn-lock",onclick:lockMonth},["🔒 Lock Month"])
       ):null,
-      el("button",{cls:"manage-btn"+(S.showManage?" active":""),onclick:function(){S.showManage=!S.showManage;if(isAdmin)S.showUserMgmt=false;render();}},["⚙ Stations ("+stns.length+")"]),
+      S.view==="status"?el("button",{cls:"hdr-btn",title:"Fetch live station status from DHM River Watch and auto-fill today's A/I",onclick:openRiverWatchSync},["🌐 River Watch Sync"]):null,
+      el("button",{cls:"manage-btn"+(S.showManage?" active":""),onclick:function(){S.showManage=!S.showManage;if(S.showManage)S.view="status";if(isAdmin)S.showUserMgmt=false;render();}},["⚙ Stations ("+stns.length+")"]),
       isAdmin?el("button",{cls:"manage-btn"+(S.showUserMgmt?" active":""),onclick:function(){S.showUserMgmt=!S.showUserMgmt;S.showManage=false;render();}},["👥 Users"]):null,
       el("div",{cls:"user-pill"},[
         txt("👤 "+AUTH.user.username),
@@ -1802,8 +2363,19 @@ function render(){
 
   app.appendChild(el("div",{cls:"tabs"},[
     el("button",{cls:"tab"+(S.view==="status"?" active":""),onclick:function(){S.view="status";render();}},["📋 Daily Status"]),
-    el("button",{cls:"tab"+(S.view==="summary"?" active":""),onclick:function(){S.view="summary";render();}},["📊 Annual Summary"])
+    el("button",{cls:"tab"+(S.view==="summary"?" active":""),onclick:function(){S.view="summary";render();}},["📊 Annual Summary"]),
+    el("button",{cls:"tab"+(S.view==="inventory"?" active":""),onclick:function(){S.view="inventory";render();}},["📡 Modem Inventory"])
   ]));
+
+  if(S.view==="inventory"){
+    renderInventory(app);
+    app.appendChild(el("div",{cls:"footer"},[
+      el("span",["Modem & recharge inventory · Changes auto-saved"]),
+      el("span",[S.office+" · "+S.subtype+" · "+(S.invSide==="sat"?"Satellite":"GSM")])
+    ]));
+    app.appendChild(el("div",{cls:"dev-footer"},["Developed by: Avishek Pokhrel, Hydrologist, DHM"]));
+    return;
+  }
 
   if(S.view==="summary"){
     renderSummary(app);
