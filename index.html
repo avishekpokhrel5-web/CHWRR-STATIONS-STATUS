@@ -5,2571 +5,294 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RLS Station Daily Status Register — CHWRR 2026</title>
 <style>
-/* ── RESET ── */
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;font-size:13px;background:#e8edf3;padding:16px}
-select,input,button{font-family:inherit}
-
-/* ── PASSWORD EYE TOGGLE ── */
-.pw-wrap{position:relative;display:flex;align-items:center}
-.pw-wrap input{flex:1;padding-right:32px!important}
-.pw-eye{position:absolute;right:8px;background:none;border:none;cursor:pointer;
-  padding:0;font-size:15px;line-height:1;color:#94a3b8;user-select:none;
-  display:flex;align-items:center}
-.pw-eye:hover{color:#475569}
-
-/* ── LOGIN ── */
-.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#0b1e38 0%,#1a3558 55%,#2b4d7c 100%);padding:20px}
-.login-card{width:100%;max-width:420px;background:#fff;border-radius:12px;overflow:hidden;
-  box-shadow:0 12px 50px rgba(0,0,0,0.35)}
-.login-header{background:#1a3558;color:#fff;padding:24px 28px}
-.login-logo{font-size:32px;margin-bottom:8px}
-.login-title{font-size:16px;font-weight:bold;margin-bottom:3px}
-.login-sub{font-size:11px;opacity:0.6;line-height:1.5}
-.login-body{padding:24px 28px}
-.lf{margin-bottom:16px}
-.lf label{display:block;font-size:11px;font-weight:bold;color:#475569;margin-bottom:5px;
-  text-transform:uppercase;letter-spacing:.05em}
-.lf input{width:100%;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:6px;
-  font-size:13px;outline:none;transition:border-color .15s}
-.lf input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-.captcha-box{background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;
-  padding:10px 16px;text-align:center;font-size:22px;font-weight:bold;
-  color:#1a3558;letter-spacing:6px;font-family:monospace;margin-bottom:6px}
-.btn-login{width:100%;padding:11px;background:#1a3558;color:#fff;border:none;
-  border-radius:7px;font-size:14px;font-weight:bold;cursor:pointer;margin-top:4px;
-  transition:background .15s}
-.btn-login:hover{background:#2563eb}
-.login-err{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;
-  padding:8px 12px;border-radius:5px;font-size:12px;margin-bottom:14px}
-.login-hint{font-size:11px;color:#94a3b8;text-align:center;margin-top:12px}
-
-/* ── APP SHELL ── */
-#app{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.12)}
-
-/* ── HEADER ── */
-.header{background:#1a3558;color:#fff;padding:12px 16px}
-.header-title{font-size:14px;font-weight:bold;margin-bottom:10px;cursor:pointer;display:inline-block}
-.header-title:hover{opacity:.85;text-decoration:underline;text-underline-offset:3px}
-.header-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.ctrl{display:flex;align-items:center;gap:5px}
-.ctrl-lbl{font-size:11px;opacity:.7;white-space:nowrap}
-.hdr-sel{font-size:12px;padding:4px 6px;border-radius:4px;
-  border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);
-  color:#fff;cursor:pointer}
-.hdr-sel option{color:#000;background:#fff}
-.hdr-btn{font-size:11px;padding:4px 10px;border-radius:4px;
-  border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);
-  color:#fff;cursor:pointer;white-space:nowrap}
-.hdr-btn:hover{background:rgba(255,255,255,.2)}
-.hdr-btn-red{border-color:rgba(255,150,150,.4);background:rgba(200,40,40,.2)}
-.hdr-btn-red:hover{background:rgba(200,40,40,.35)}
-.hdr-btn-active{background:rgba(255,255,255,.22);font-weight:bold}
-.hdr-btn-lock{background:rgba(160,110,0,.3);border-color:rgba(255,200,80,.5);color:#fde68a}
-.hdr-btn-lock:hover{background:rgba(180,130,0,.45)}
-.hdr-btn-locked{background:rgba(160,0,0,.35);border-color:rgba(255,120,120,.5);
-  color:#fca5a5;font-weight:bold}
-.manage-btn{font-size:11px;padding:5px 12px;border-radius:4px;
-  border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);
-  color:#fff;cursor:pointer;white-space:nowrap}
-.manage-btn:hover,.manage-btn.active{background:rgba(255,255,255,.22)}
-.quick-links{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:9px;
-  padding-top:9px;border-top:1px solid rgba(255,255,255,.12)}
-.quick-links .ql-lbl{font-size:10px;opacity:.6;text-transform:uppercase;
-  letter-spacing:.05em;margin-right:2px}
-.ql{font-size:11px;padding:3px 11px;border-radius:14px;text-decoration:none;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);
-  color:#dbeafe;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
-.ql:hover{background:rgba(96,165,250,.3);color:#fff;border-color:rgba(96,165,250,.5)}
-.user-pill{font-size:11px;padding:3px 10px;border-radius:20px;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
-  color:rgba(255,255,255,.85);display:flex;align-items:center;gap:5px}
-.logout-btn{font-size:10px;padding:2px 7px;border-radius:4px;
-  border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);
-  color:rgba(255,255,255,.7);cursor:pointer}
-.logout-btn:hover{background:rgba(180,0,0,.3);color:#fca5a5}
-.sub-panel{margin-top:10px;background:rgba(0,0,0,.22);border-radius:6px;padding:10px 12px}
-.sub-panel-row{display:flex;gap:8px;align-items:center}
-.sub-panel input{flex:1;font-size:12px;padding:5px 8px;border-radius:4px;
-  border:none;background:rgba(255,255,255,.92);color:#000;outline:none}
-.btn-add{padding:5px 14px;background:#2563eb;border:none;color:#fff;
-  border-radius:4px;font-size:12px;cursor:pointer}
-.btn-add:hover{background:#1d4ed8}
-.btn-x{padding:5px 9px;background:rgba(255,255,255,.15);border:none;
-  color:#fff;border-radius:4px;font-size:12px;cursor:pointer}
-.del-panel{margin-top:10px;background:rgba(0,0,0,.22);border-radius:6px;
-  overflow:hidden;border:1px solid rgba(255,120,120,.3)}
-.del-panel-info{font-size:11px;padding:8px 12px;opacity:.7;
-  border-bottom:1px solid rgba(255,255,255,.1)}
-.del-row{display:flex;justify-content:space-between;align-items:center;
-  padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
-.del-row-name{font-size:12px}
-.del-row-name.current{opacity:.6;font-style:italic}
-.btn-del-off{font-size:11px;padding:3px 10px;border-radius:4px;
-  border:1px solid rgba(255,120,120,.5);background:rgba(200,40,40,.25);
-  color:#fca5a5;cursor:pointer}
-.btn-del-off:hover{background:rgba(200,40,40,.45)}
-.protected-lbl{font-size:10px;opacity:.45;font-style:italic}
-
-/* ── TOAST ── */
-.toast{padding:8px 14px;border-radius:6px;font-size:12px;margin-bottom:8px;font-weight:bold}
-.toast-ok{background:#f0fdf4;border:1px solid #86efac;color:#15803d}
-.toast-err{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626}
-
-/* ── LEGEND & LOCK BANNER ── */
-.legend{display:flex;flex-wrap:wrap;gap:14px;padding:6px 14px;
-  background:#edf2f7;border-bottom:1px solid #d1dce8;align-items:center}
-.leg-item{display:flex;align-items:center;gap:4px;font-size:11px}
-.leg-code{font-weight:bold;font-size:12px}
-.leg-hint{margin-left:auto;font-size:10px;color:#94a3b8;font-style:italic}
-.lock-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;
-  font-weight:bold;color:#92400e;background:#fef9c3;border:1px solid #fbbf24;
-  border-radius:12px;padding:2px 10px;white-space:nowrap}
-.lock-tag .unlock-lnk{font-size:10px;color:#2563eb;cursor:pointer;
-  text-decoration:underline;margin-left:4px;font-weight:normal}
-.lock-tag .unlock-lnk:hover{color:#1d4ed8}
-
-/* ── MANAGE STATIONS PANEL ── */
-.manage-panel{background:#f8fafc;border-bottom:1px solid #d1dce8;padding:14px 16px}
-.manage-title{font-weight:bold;font-size:13px;color:#1a3558;margin-bottom:12px}
-.manage-title .off{color:#2563eb}
-.manage-title .sub{color:#7c3aed}
-.stn-form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;
-  background:#fff;padding:10px 12px;border-radius:6px;
-  border:1px solid #e2e8f0;margin-bottom:12px}
-.fld{display:flex;flex-direction:column;gap:3px}
-.fld label{font-size:10px;color:#64748b}
-.fld input,.fld select{font-size:12px;padding:5px 8px;border-radius:4px;
-  border:1px solid #d1d5db;background:#fff;color:#000;outline:none}
-.fld-grow{flex:1;min-width:340px}
-.fld-grow input{width:100%}
-.btn-stn-add{padding:6px 14px;background:#1a3558;color:#fff;border:none;
-  border-radius:4px;font-size:12px;cursor:pointer;font-weight:bold;
-  align-self:flex-end;height:31px}
-.btn-stn-add:hover{background:#2b4d7c}
-.stn-list{max-height:200px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px}
-.stn-list table{width:100%;border-collapse:collapse;font-size:12px}
-.stn-list thead th{background:#dce7f0;padding:5px 8px;font-weight:bold;color:#1a3558;
-  border-bottom:1px solid #c4d4e3;font-size:11px;position:sticky;top:0;z-index:1}
-.stn-list tbody td{padding:4px 8px;border-bottom:1px solid #f1f5f9;font-size:12px}
-.stn-list tbody tr:nth-child(even) td{background:#f8fafc}
-.btn-rm{font-size:11px;color:#dc2626;background:none;border:none;cursor:pointer;padding:2px 6px}
-.btn-rm:hover{text-decoration:underline}
-.btn-edit{font-size:11px;color:#2563eb;background:none;border:none;cursor:pointer;padding:2px 6px}
-.btn-edit:hover{text-decoration:underline}
-.stn-actions{display:flex;gap:4px;align-items:center;white-space:nowrap}
-.edit-row td{background:#eff6ff!important;padding:6px 8px!important}
-.edit-inline{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end}
-.edit-inline input,.edit-inline select{font-size:12px;padding:4px 7px;border-radius:4px;
-  border:1px solid #93c5fd;background:#fff;color:#000;outline:none}
-.edit-inline .btn-save{padding:4px 12px;background:#2563eb;color:#fff;border:none;
-  border-radius:4px;font-size:12px;cursor:pointer;font-weight:bold}
-.edit-inline .btn-save:hover{background:#1d4ed8}
-.edit-inline .btn-cancel{padding:4px 10px;background:#f1f5f9;color:#374151;border:1px solid #d1d5db;
-  border-radius:4px;font-size:12px;cursor:pointer}
-.edit-inline .btn-cancel:hover{background:#e2e8f0}
-.empty-note{color:#94a3b8;font-size:12px;font-style:italic;padding:8px 0}
-
-/* ── USER MANAGEMENT ── */
-.user-mgmt-panel{background:#f0f7ff;border-bottom:1px solid #bfdbfe;padding:14px 16px}
-.user-form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;
-  background:#fff;padding:10px 12px;border-radius:6px;
-  border:1px solid #dbeafe;margin-bottom:12px}
-.user-list-wrap{border:1px solid #e2e8f0;border-radius:6px;overflow:hidden}
-.user-list-wrap table{width:100%;border-collapse:collapse;font-size:12px}
-.user-list-wrap thead th{background:#dce7f0;padding:5px 8px;font-weight:bold;
-  color:#1a3558;border-bottom:1px solid #c4d4e3;font-size:11px}
-.user-list-wrap tbody td{padding:5px 8px;border-bottom:1px solid #f1f5f9;font-size:12px;
-  vertical-align:top}
-.user-list-wrap tbody tr:nth-child(even) td{background:#f8fafc}
-.role-pill{display:inline-block;font-size:10px;padding:2px 8px;
-  border-radius:10px;font-weight:bold}
-.role-admin{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
-.role-de{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
-.off-checks{display:flex;flex-wrap:wrap;gap:4px;padding:2px 0}
-.off-checks label{display:flex;align-items:center;gap:3px;font-size:11px;
-  cursor:pointer;background:#f1f5f9;padding:2px 7px;border-radius:4px;
-  border:1px solid #e2e8f0}
-.off-checks label:hover{background:#dce7f0}
-.sub-checks{display:flex;flex-wrap:wrap;gap:4px;padding:2px 0}
-.sub-checks label{display:flex;align-items:center;gap:3px;font-size:11px;
-  cursor:pointer;background:#f0fdf4;padding:2px 7px;border-radius:4px;
-  border:1px solid #bbf7d0}
-.sub-checks label:hover{background:#dcfce7}
-.sub-checks label.snow{background:#eff6ff;border-color:#bfdbfe}
-.sub-checks label.snow:hover{background:#dbeafe}
-.perm-section{margin-top:6px}
-.perm-section-lbl{font-size:10px;font-weight:bold;color:#475569;text-transform:uppercase;
-  letter-spacing:.05em;margin-bottom:4px}
-.btn-sm{font-size:11px;padding:3px 8px;border-radius:4px;cursor:pointer;
-  border:1px solid #d1d5db;background:#fff;color:#374151}
-.btn-sm:hover{background:#f1f5f9}
-.btn-sm-red{color:#dc2626;border-color:rgba(220,38,38,.3);background:#fef2f2}
-.btn-sm-red:hover{background:#fee2e2}
-.btn-sm-blue{color:#2563eb;border-color:rgba(37,99,235,.3);background:#eff6ff}
-.btn-sm-blue:hover{background:#dbeafe}
-
-/* ── STATUS TABLE ── */
-.tbl-wrap{overflow-x:auto}
-table.status{border-collapse:collapse;font-size:11px}
-table.status th{background:#2b4d7c;color:#fff;padding:5px 4px;text-align:center;
-  font-size:11px;border-right:1px solid rgba(255,255,255,.15);
-  white-space:nowrap;vertical-align:middle}
-table.status th.dark{background:#1a3558}
-table.status th.tleft{text-align:left;padding-left:8px}
-table.status th.dim{opacity:.25}
-
-table.status td{padding:3px 4px;border-right:1px solid #e2e8f0;
-  font-size:11px;vertical-align:middle}
-table.status tbody tr:nth-child(even) td{background:#f8fafc}
-table.status td.day{text-align:center;padding:0;cursor:pointer;
-  user-select:none;width:26px;height:22px;font-weight:bold;font-size:11px}
-table.status td.day:hover:not(.dlocked){filter:brightness(.88)}
-  table.status td.day:hover:not(.dlocked){background:#fff7ed!important;color:#c2410c!important;
-  box-shadow:inset 0 0 0 2px #fb923c;border-radius:3px}
-table.status td.day.dlocked{cursor:not-allowed!important;
-  background-image:repeating-linear-gradient(
-    45deg,transparent,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 6px
-  )!important}
-table.status td.grayed{background:#f1f5f9}
-table.status td.active-days{text-align:center;font-weight:bold;
-  color:#15803d;background:#f0fdf4}
-table.status td.inactive-days{text-align:center;font-weight:bold;
-  color:#dc2626;background:#fef2f2}
-table.status tfoot tr td{background:#f8fafc;font-size:11px}
-table.status tfoot tr.total td{background:#dce7f0;border-top:2px solid #2b4d7c}
-table.status tfoot td.flbl{text-align:right;padding:4px 10px;
-  font-weight:bold;border-right:1px solid #e2e8f0}
-table.status td.no-stn{padding:30px;text-align:center;
-  color:#94a3b8;font-style:italic}
-
-/* Remarks column */
-table.status td.remarks-cell{padding:2px 4px;vertical-align:middle;background:#fafff5}
-table.status td.remarks-cell:focus-within{background:#fefce8}
-.remarks-inp{width:100%;min-width:100px;border:none;background:transparent;
-  font-size:10px;color:#374151;font-family:Arial,sans-serif;outline:none;
-  padding:2px 3px;border-radius:2px}
-.remarks-inp:focus{background:#fef9c3;border-radius:3px}
-.remarks-inp::placeholder{color:#c4cdd6;font-style:italic}
-.remarks-inp:disabled{color:#94a3b8;cursor:not-allowed!important}
-
-
-/* ── ANNUAL SUMMARY — VERTICAL 2-COL GRID ── */
-.summary-wrap{padding:12px 14px}
-.sum-action-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;
-  margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #e2e8f0}
-.sum-info{font-size:11px;color:#64748b;flex:1}
-.btn-dl{font-size:11px;padding:6px 14px;border-radius:5px;border:1px solid #d1d5db;
-  background:#fff;color:#1a3558;cursor:pointer;font-weight:bold;
-  display:flex;align-items:center;gap:5px;white-space:nowrap}
-.btn-dl:hover{background:#eff6ff;border-color:#93c5fd;color:#2563eb}
-.btn-dl-pdf{border-color:#fca5a5;color:#dc2626}
-.btn-dl-pdf:hover{background:#fef2f2;border-color:#f87171}
-.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:900px){.sum-grid{grid-template-columns:1fr}}
-.sum-section{border:1px solid #d1dce8;border-radius:7px;overflow:hidden}
-.sum-sec-hdr{background:#2b4d7c;color:#fff;padding:6px 10px;font-size:12px;
-  font-weight:bold;display:flex;justify-content:space-between;align-items:center}
-.sum-sec-body{overflow-x:auto}
-table.sum-month{border-collapse:collapse;font-size:10px;min-width:100%}
-table.sum-month th{background:#1e3d6a;color:#fff;padding:3px 2px;text-align:center;
-  font-size:9px;border-right:1px solid rgba(255,255,255,.1);white-space:nowrap}
-table.sum-month th.tleft{text-align:left;padding-left:6px}
-table.sum-month td{padding:1px 2px;border-right:1px solid #e8edf3;
-  font-size:10px;vertical-align:middle}
-table.sum-month tbody tr:nth-child(even) td{background:#f8fafc}
-table.sum-month td.mtick{width:13px;height:17px;padding:0;text-align:center;
-  font-size:8px;font-weight:bold;cursor:pointer}
-table.sum-month td.mtick:hover{filter:brightness(.88)}
-table.sum-month td.mcnt{width:22px;text-align:center;font-size:10px;font-weight:bold;padding:2px}
-table.sum-month tfoot td{background:#dce7f0;border-top:1px solid #b0c4d8;
-  font-size:9px;text-align:center;font-weight:bold}
-.no-data-msg{padding:30px;text-align:center;color:#94a3b8;font-style:italic;font-size:12px}
-
-/* ── STATUS POPUP ── */
-#status-popup{position:fixed;z-index:9998;background:#fff;border:1px solid #d1dce8;
-  border-radius:7px;box-shadow:0 6px 24px rgba(0,0,0,.18);
-  min-width:180px;overflow:hidden;display:none}
-.sp-title{padding:5px 12px;font-size:10px;color:#64748b;background:#f8fafc;
-  border-bottom:1px solid #e2e8f0;font-weight:bold;text-transform:uppercase;
-  letter-spacing:.05em}
-.sp-opt{display:flex;align-items:center;padding:7px 12px;cursor:pointer;
-  gap:8px;font-size:12px;border-bottom:1px solid #f1f5f9;transition:background .1s}
-.sp-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.sp-chk{width:14px;font-size:10px;text-align:center;color:#64748b}
-
-/* ── SYNC / FOOTER / TABS ── */
-#sync-bar{position:fixed;bottom:12px;right:14px;z-index:9999}
-.sync-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;
-  border-radius:20px;font-size:11px;font-weight:bold;
-  box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.sync-ok{background:#f0fdf4;border:1px solid #86efac;color:#15803d}
-.sync-save{background:#eff6ff;border:1px solid #93c5fd;color:#1d4ed8}
-.sync-err{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626}
-.sync-init{background:#fefce8;border:1px solid #fde047;color:#92400e}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
-.footer{padding:6px 14px;background:#edf2f7;border-top:1px solid #d1dce8;
-  font-size:10px;color:#94a3b8;display:flex;justify-content:space-between;
-  flex-wrap:wrap;gap:4px}
-.dev-footer{padding:5px 14px;background:#1a3558;color:rgba(255,255,255,.45);
-  font-size:10px;text-align:right;letter-spacing:.03em;border-radius:0 0 8px 8px}
-.tabs{display:flex;background:#162d48;border-bottom:2px solid #2b4d7c}
-.tab{padding:8px 20px;font-size:12px;color:rgba(255,255,255,.55);cursor:pointer;
-  border:none;background:none;border-bottom:2px solid transparent;
-  margin-bottom:-2px;white-space:nowrap}
-.tab:hover{color:rgba(255,255,255,.85)}
-.tab.active{color:#fff;font-weight:bold;border-bottom:2px solid #60a5fa}
-
-/* ── LOCK WARNING MODAL ── */
-.lock-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;
-  display:flex;align-items:center;justify-content:center;}
-.lock-modal{background:#fff;border-radius:12px;width:460px;max-width:95vw;
-  box-shadow:0 12px 50px rgba(0,0,0,.3);overflow:hidden;}
-.lock-modal-hdr{background:#1a3558;color:#fff;padding:16px 20px;
-  display:flex;align-items:center;gap:10px;}
-.lock-modal-hdr .icon{font-size:22px;}
-.lock-modal-hdr .ttl{font-size:14px;font-weight:bold;}
-.lock-modal-hdr .sub{font-size:11px;opacity:.65;margin-top:2px;}
-.lock-modal-body{padding:16px 20px;max-height:320px;overflow-y:auto;}
-.lock-warn-intro{font-size:12px;color:#374151;margin-bottom:10px;line-height:1.5;}
-.lock-warn-intro b{color:#dc2626;}
-.miss-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px;}
-.miss-table th{background:#dce7f0;padding:4px 8px;text-align:left;
-  font-size:10px;color:#1a3558;border-bottom:1px solid #c4d4e3;}
-.miss-table td{padding:4px 8px;border-bottom:1px solid #f1f5f9;}
-.miss-table tbody tr:nth-child(even) td{background:#f8fafc;}
-.miss-days{font-size:10px;color:#dc2626;font-weight:bold;}
-.lock-modal-foot{padding:12px 20px;background:#f8fafc;border-top:1px solid #e2e8f0;
-  display:flex;gap:8px;justify-content:flex-end;align-items:center;}
-.lock-modal-foot .warn-note{flex:1;font-size:11px;color:#92400e;
-  background:#fef9c3;border:1px solid #fbbf24;border-radius:5px;
-  padding:5px 10px;line-height:1.4;}
-.btn-lock-cancel{padding:7px 16px;background:#f1f5f9;color:#374151;
-  border:1px solid #d1d5db;border-radius:6px;font-size:12px;cursor:pointer;}
-.btn-lock-cancel:hover{background:#e2e8f0;}
-.btn-lock-confirm{padding:7px 16px;background:#1a3558;color:#fff;
-  border:none;border-radius:6px;font-size:12px;font-weight:bold;cursor:pointer;}
-.btn-lock-confirm:hover{background:#2b4d7c;}
-.btn-lock-force{padding:7px 16px;background:#dc2626;color:#fff;
-  border:none;border-radius:6px;font-size:12px;font-weight:bold;cursor:pointer;}
-.btn-lock-force:hover{background:#b91c1c;}
-
-/* ── DOWNLOAD DROPDOWNS ── */
-.dl-wrap{position:relative;display:inline-block;}
-.btn-dl-drop{font-size:11px;padding:6px 12px;border-radius:5px;cursor:pointer;
-  font-weight:bold;display:flex;align-items:center;gap:5px;white-space:nowrap;
-  border:1px solid #d1d5db;background:#fff;color:#1a3558;}
-.btn-dl-drop:hover{background:#eff6ff;border-color:#93c5fd;color:#2563eb;}
-.btn-dl-drop.red{border-color:#fca5a5;color:#dc2626;}
-.btn-dl-drop.red:hover{background:#fef2f2;border-color:#f87171;}
-.dl-menu{position:absolute;top:calc(100% + 4px);left:0;z-index:600;
-  background:#fff;border:1px solid #d1dce8;border-radius:8px;
-  box-shadow:0 8px 28px rgba(0,0,0,.16);min-width:220px;overflow:hidden;display:none;}
-.dl-menu.open{display:block;}
-.dl-menu-section{font-size:10px;color:#94a3b8;padding:7px 13px 4px;
-  text-transform:uppercase;letter-spacing:.06em;font-weight:bold;
-  border-bottom:1px solid #f1f5f9;background:#fafbfc;}
-.dl-menu-item{display:flex;align-items:center;padding:7px 13px;
-  cursor:pointer;font-size:12px;gap:10px;border-bottom:1px solid #f8fafc;
-  transition:background .1s;}
-.dl-menu-item:last-child{border-bottom:none;}
-.dl-menu-item:hover{background:#eff6ff;}
-.dl-menu-item.pdf-item:hover{background:#fef2f2;}
-.dl-menu-item .mi-icon{font-size:13px;width:18px;text-align:center;flex-shrink:0;}
-.dl-menu-item .mi-label{flex:1;color:#1a3558;line-height:1.3;}
-.dl-menu-item .mi-label .mi-sub{display:block;font-size:10px;color:#94a3b8;margin-top:1px;}
-.dl-menu-item.pdf-item .mi-label{color:#dc2626;}
-.dl-menu-item .mi-badge{font-size:9px;padding:2px 6px;border-radius:3px;
-  font-weight:bold;white-space:nowrap;}
-.mi-badge-annual{background:#dbeafe;color:#1d4ed8;}
-.mi-badge-month{background:#f1f5f9;color:#64748b;}
-.dl-menu-divider{height:1px;background:#e2e8f0;margin:2px 0;}
-.dl-menu-months{max-height:220px;overflow-y:auto;}
-.dl-menu-months .dl-menu-item .mi-label{color:#374151;}
-.dl-no-data{color:#c4d4e3!important;}
-
-/* ── MODEM INVENTORY ── */
-.inv-wrap{padding:12px 14px}
-.inv-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;
-  margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #e2e8f0}
-.inv-info{font-size:11px;color:#64748b;flex:1;min-width:180px}
-.inv-toggle{display:flex;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden}
-.inv-tg{padding:6px 16px;font-size:12px;border:none;background:#fff;cursor:pointer;
-  color:#64748b;font-weight:bold;display:flex;align-items:center;gap:5px}
-.inv-tg:not(:last-child){border-right:1px solid #e2e8f0}
-.inv-tg:hover{background:#f1f5f9}
-.inv-tg.sat.active{background:#1d4ed8;color:#fff}
-.inv-tg.gsm.active{background:#15803d;color:#fff}
-.inv-filter{display:flex;align-items:center;gap:5px;font-size:11px;color:#475569;
-  cursor:pointer;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;padding:5px 10px}
-.inv-filter:hover{background:#f1f5f9}
-table.inv{border-collapse:collapse;width:100%;font-size:11px;min-width:1050px}
-table.inv th{background:#2b4d7c;color:#fff;padding:5px 6px;text-align:center;font-size:10px;
-  border-right:1px solid rgba(255,255,255,.15);white-space:nowrap;vertical-align:middle}
-table.inv th.grp-sat{background:#1e3a8a}
-table.inv th.grp-gsm{background:#14532d}
-table.inv th.grp-rc{background:#1a3558}
-table.inv td{padding:3px 5px;border-right:1px solid #e2e8f0;border-bottom:1px solid #f1f5f9;
-  font-size:11px;vertical-align:middle}
-table.inv tbody tr.inv-main:nth-child(4n+1) td{background:#f8fafc}
-table.inv td.c{text-align:center}
-.inv-inp{width:100%;min-width:70px;border:1px solid transparent;background:transparent;
-  font-size:11px;color:#1e293b;padding:3px 5px;border-radius:3px;outline:none}
-.inv-inp:hover{border-color:#dbeafe;background:#fff}
-.inv-inp:focus{border-color:#93c5fd;background:#fefce8}
-.inv-inp::placeholder{color:#c4cdd6;font-style:italic;font-size:10px}
-.inv-last{font-size:10px;color:#475569;white-space:nowrap}
-.inv-last .dim2{color:#94a3b8}
-.inv-badge{display:inline-block;font-size:9px;padding:1px 7px;border-radius:9px;
-  font-weight:bold;white-space:nowrap}
-.badge-ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
-.badge-warn{background:#fffbeb;color:#b45309;border:1px solid #fcd34d}
-.badge-exp{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5}
-.badge-none{background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;font-weight:normal;font-style:italic}
-.btn-rc-add{font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;
-  border:1px solid #93c5fd;background:#eff6ff;color:#1d4ed8;font-weight:bold;white-space:nowrap}
-.btn-rc-add:hover{background:#dbeafe}
-.btn-rc-hist{font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;
-  border:1px solid #d1d5db;background:#fff;color:#475569;white-space:nowrap}
-.btn-rc-hist:hover{background:#f1f5f9}
-.btn-rc-hist.open{background:#1a3558;color:#fff;border-color:#1a3558}
-.rc-form-row td{background:#eff6ff!important;padding:8px 10px!important;
-  border-bottom:2px solid #93c5fd!important}
-.rc-form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
-.rc-form .fld input{font-size:11px;padding:4px 7px;min-width:105px}
-.rc-form .btn-save{padding:5px 14px;background:#2563eb;color:#fff;border:none;
-  border-radius:4px;font-size:11px;cursor:pointer;font-weight:bold}
-.rc-form .btn-save:hover{background:#1d4ed8}
-.rc-form .btn-cancel{padding:5px 11px;background:#fff;color:#374151;border:1px solid #d1d5db;
-  border-radius:4px;font-size:11px;cursor:pointer}
-.rc-hist-row td{background:#fafbfc!important;padding:6px 10px 8px!important;
-  border-bottom:2px solid #cbd5e1!important}
-table.rc-hist{border-collapse:collapse;width:auto;min-width:640px;font-size:10px;
-  border:1px solid #e2e8f0;border-radius:4px}
-table.rc-hist th{background:#dce7f0;color:#1a3558;padding:3px 10px;font-size:9px;
-  text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #c4d4e3;text-align:left}
-table.rc-hist td{padding:3px 10px;border-bottom:1px solid #f1f5f9;font-size:10px;background:#fff}
-.rc-hist-lbl{font-size:9px;font-weight:bold;color:#64748b;text-transform:uppercase;
-  letter-spacing:.05em;margin-bottom:4px}
-.inv-empty{padding:30px;text-align:center;color:#94a3b8;font-style:italic;font-size:12px}
-
-/* ── RIVER WATCH SYNC ── */
-.rw-modal{background:#fff;border-radius:12px;width:860px;max-width:96vw;
-  box-shadow:0 12px 50px rgba(0,0,0,.3);overflow:hidden;display:flex;flex-direction:column;max-height:92vh}
-.rw-body{padding:14px 18px;overflow-y:auto}
-.rw-opts{display:flex;gap:14px;align-items:center;flex-wrap:wrap;
-  background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 12px;margin-bottom:12px}
-.rw-opts label{display:flex;align-items:center;gap:5px;font-size:11px;color:#475569;cursor:pointer}
-.rw-opts select{font-size:11px;padding:3px 6px;border:1px solid #d1d5db;border-radius:4px}
-.rw-note{font-size:11px;color:#92400e;background:#fef9c3;border:1px solid #fbbf24;
-  border-radius:5px;padding:6px 10px;margin-bottom:10px;line-height:1.5}
-table.rw-tbl{width:100%;border-collapse:collapse;font-size:11px}
-table.rw-tbl th{background:#dce7f0;color:#1a3558;padding:5px 8px;font-size:10px;text-align:left;
-  border-bottom:1px solid #c4d4e3;position:sticky;top:0}
-table.rw-tbl td{padding:4px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
-table.rw-tbl tbody tr:nth-child(even) td{background:#f8fafc}
-.rw-sel{width:100%;max-width:280px;font-size:11px;padding:3px 5px;
-  border:1px solid #d1d5db;border-radius:4px;background:#fff}
-.rw-prop{display:inline-block;font-size:10px;font-weight:bold;padding:1px 9px;border-radius:9px}
-.rw-prop.A{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
-.rw-prop.I{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5}
-.rw-prop.skip{background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;font-weight:normal;font-style:italic}
-.rw-lastdata{font-size:10px;color:#64748b;white-space:nowrap}
-.rw-sec-lbl{font-size:10px;font-weight:bold;color:#475569;text-transform:uppercase;
-  letter-spacing:.05em;margin:14px 0 6px}
-.rw-newlist{max-height:170px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px}
-.rw-new-row{display:flex;justify-content:space-between;align-items:center;gap:8px;
-  padding:4px 10px;border-bottom:1px solid #f1f5f9;font-size:11px}
-.rw-new-row:nth-child(even){background:#f8fafc}
-.btn-rw-imp{font-size:10px;padding:2px 9px;border-radius:4px;cursor:pointer;
-  border:1px solid #86efac;background:#f0fdf4;color:#15803d;font-weight:bold;white-space:nowrap}
-.btn-rw-imp:hover{background:#dcfce7}
-.rw-loading{padding:40px;text-align:center;color:#64748b;font-size:13px}
-.rw-err{padding:24px;text-align:center;color:#dc2626;font-size:12px;line-height:1.6}
-
-/* ── PRINT ── */
-@media print{
-  body{background:#fff;padding:4px}
-  #sync-bar,#toast,.tabs,.sum-action-bar,.hdr-btn,.manage-btn,.logout-btn{display:none!important}
-  .sum-section{break-inside:avoid;page-break-inside:avoid}
-  .sum-grid{grid-template-columns:1fr 1fr!important}
-  #app{box-shadow:none;border-radius:0}
-}
-</style>
-
-<script>
-var SB_URL = "https://hmnsnvrgaksvjzmvasrl.supabase.co";
-var SB_KEY = "sb_publishable_VMREBL29jk3WCJWhTxpcZw_GTd9F5rV";
-var SB_KV  = SB_URL + "/rest/v1/kv";
-var SB_HEADERS = {
-  "apikey": SB_KEY,
-  "Authorization": "Bearer " + SB_KEY,
-  "Content-Type": "application/json"
-};
-
-var _saveTimer = null, _lastSaved = null;
-
-function setSyncStatus(type, msg) {
-  var bar = document.getElementById("sync-bar");
-  if (!bar) return;
-  var cls = { ok: "sync-ok", save: "sync-save", err: "sync-err", init: "sync-init" }[type] || "sync-init";
-  bar.innerHTML = '<span class="sync-pill ' + cls + '"><span class="sync-dot"></span> ' + msg + '</span>';
-}
-
-// Load: pull every row from kv, write into localStorage (except protected keys).
-function gsLoad(cb) {
-  setSyncStatus("init", "Loading data…");
-
-  // Protect rls_users: accounts/office assignments are local-authoritative.
-  var PROTECTED = ["rls_users"];
-  var localSnap = {};
-  PROTECTED.forEach(function (k) { try { var v = localStorage.getItem(k); if (v) localSnap[k] = v; } catch (e) {} });
-
-  fetch(SB_KV + "?select=key,value", { method: "GET", headers: SB_HEADERS })
-    .then(function (r) { return r.json(); })
-    .then(function (rows) {
-      if (Array.isArray(rows)) {
-        rows.forEach(function (row) {
-          var k = row.key;
-          if (PROTECTED.indexOf(k) >= 0) return; // skip — local wins
-          try { localStorage.setItem(k, JSON.stringify(row.value)); } catch (e) {}
-        });
-        // Restore protected keys from snapshot; seed from server only if nothing local
-        PROTECTED.forEach(function (k) {
-          if (localSnap[k]) { try { localStorage.setItem(k, localSnap[k]); } catch (e) {} }
-          else {
-            var found = rows.find(function (r) { return r.key === k; });
-            if (found !== undefined && found) { try { localStorage.setItem(k, JSON.stringify(found.value)); } catch (e) {} }
-          }
-        });
-        setSyncStatus("ok", "Loaded ✓");
-      }
-      if (cb) cb(true);
-    })
-    .catch(function () { setSyncStatus("err", "Load failed — using local data"); if (cb) cb(false); });
-}
-
-// Save: upsert every rls* localStorage key as its own row in kv.
-function gsSave() {
-  var rows = [];
-  for (var i = 0; i < localStorage.length; i++) {
-    var k = localStorage.key(i);
-    if (k && k.indexOf("rls") === 0) {
-      var val;
-      try { val = JSON.parse(localStorage.getItem(k)); } catch (e) { val = localStorage.getItem(k); }
-      rows.push({ key: k, value: val, updated_at: new Date().toISOString() });
-    }
+  :root {
+    --bg-main: #0f172a;
+    --card-bg: #1e293b;
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent: #0284c7;
+    --accent-hover: #0369a1;
+    --border: #334155;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
   }
-  var json = JSON.stringify(rows);
-  if (json === _lastSaved) return;
-  _lastSaved = json;
-  setSyncStatus("save", "Saving…");
-
-  // Upsert (on_conflict=key). Prefer header merges duplicates by primary key.
-  fetch(SB_KV + "?on_conflict=key", {
-    method: "POST",
-    headers: Object.assign({}, SB_HEADERS, { "Prefer": "resolution=merge-duplicates" }),
-    body: json
-  })
-    .then(function (r) { if (!r.ok) throw new Error(); return r.text(); })
-    .then(function () { setSyncStatus("ok", "Saved to Supabase ✓"); })
-    .catch(function () { setSyncStatus("err", "Save failed — check connection"); });
-}
-
-function scheduleSave() {
-  if (_saveTimer) clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(gsSave, 1500);
-}
-
-function startAutoRefresh() {
-  setInterval(function () {
-    if (document.hidden) return;
-    gsLoad(function (ok) { if (ok && window._appRender) window._appRender(); });
-  }, 30000);
-}
-</script>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  body { background-color: var(--bg-main); color: var(--text-primary); padding: 20px; line-height: 1.5; }
+  .container { max-width: 1400px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  h1 { font-size: 1.5rem; color: #38bdf8; }
+  .btn { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; transition: background 0.2s; }
+  .btn:hover { background: var(--accent-hover); }
+  .btn-danger { background: var(--danger); }
+  .btn-danger:hover { background: #dc2626; }
+  .btn-secondary { background: #475569; }
+  .btn-secondary:hover { background: #334155; }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+  .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  label { font-size: 0.85rem; color: var(--text-muted); }
+  input, select { background: #0f172a; border: 1px solid var(--border); color: white; padding: 8px 12px; border-radius: 6px; }
+  input:focus, select:focus { outline: 1px solid var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  th, td { border: 1px solid var(--border); padding: 10px; text-align: left; font-size: 0.9rem; }
+  th { background: #0f172a; color: #38bdf8; }
+  tr:nth-child(even) { background: #162032; }
+  .flash-msg { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 6px; background: var(--success); color: white; font-weight: 500; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: none; z-index: 100; }
+  .flash-error { background: var(--danger); }
+  .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 50; }
+  .modal-content { background: var(--card-bg); padding: 25px; border-radius: 8px; width: 100%; max-width: 500px; border: 1px solid var(--border); }
+  .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+  .nav-tab { padding: 8px 16px; background: #0f172a; border: 1px solid var(--border); color: var(--text-muted); border-radius: 6px; cursor: pointer; }
+  .nav-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+</style>
 </head>
 <body>
-<div id="sync-bar"><span class="sync-pill sync-init"><span class="sync-dot"></span> Starting…</span></div>
-<div id="toast"></div>
-<div id="app"></div>
-<div id="status-popup"></div>
 
-<!-- ═══════════════════════════════════════════
-     MAIN APPLICATION
-═══════════════════════════════════════════ -->
+<div class="container">
+  <header>
+    <div>
+      <h1>RLS Station Daily Status Register</h1>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Center of Hydrology and Water Resources Research — 2026</p>
+    </div>
+    <div id="auth-controls"></div>
+  </header>
+
+  <div class="nav-tabs" id="tab-controls"></div>
+
+  <div id="main-content"></div>
+</div>
+
+<div id="flash-banner" class="flash-msg"></div>
+<div id="modal-container"></div>
+
 <script>
-/* ── CONSTANTS ── */
-var CUR_YEAR=new Date().getFullYear();
-var YEARS=(function(){var a=[];for(var y=2020;y<=CUR_YEAR+5;y++)a.push(y);return a;})();
-var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
-var SUBTYPES=[
-  "Hydrological Stations",
-  "Flood Stations",
-  "Snow Stations — RLS",
-  "Snow Stations — AWS",
-  "Snow Stations — Glacier Camera"
+/* ── LOCAL STORAGE HELPERS ── */
+function lGet(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }
+function lSet(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+function lDel(k){ try { localStorage.removeItem(k); } catch(e){} }
+
+/* ── CONSTANTS & AUTH ── */
+var CUR_YEAR = 2026;
+var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+var SUBTYPES = ["Hydrological Stations", "Meteorological Stations"];
+var DEF_HYDRO = [
+  { no: "240", name: "Karnali at Asaraghat", elev: "540m", type: "Manual+Automatic", med: "GSM" },
+  { no: "250", name: "West Seti at Slaugad", elev: "820m", type: "Manual+Automatic", med: "GSM" }
 ];
-var SUBTYPE_GROUPS=[
-  {label:"Hydrological", options:["Hydrological Stations"]},
-  {label:"Flood", options:["Flood Stations"]},
-  {label:"Snow Stations", options:["Snow Stations — RLS","Snow Stations — AWS","Snow Stations — Glacier Camera"]}
-];
-var TYPES=["Manual+Automatic","Manual","Automatic"];
-var MEDIUMS=["GSM","Satellite","N/A"];
 
-var S_OPTS=["","A","I","F","-"];
-var S_CLR={A:"#15803d",I:"#dc2626",D:"#7c3aed",F:"#c2410c","-":"#6b7280"};
-var S_BG ={A:"#f0fdf4",I:"#fef2f2",D:"#faf5ff",F:"#fff7ed","-":"#f9fafb"};
-var S_LBL={A:"Active",I:"Inactive",F:"Flooded Away","-":"Unchecked","":"Clear/Empty"};
-
-/* ── DEFAULT STATIONS ── */
-var DEF_HYDRO=[];
-
-/* ── AUTH ── */
-var AUTH={
-  loggedIn:false,user:null,
-  captchaA:0,captchaB:0,
-  loginUsername:"",loginPassword:"",loginCaptcha:"",loginError:""
+var AUTH = {
+  user: lGet("rls_auth_user") || { username: "admin", role: "admin", offices: ["CHWRR", "OHM Dharan"] }
 };
 
-function hashPwd(p){return btoa(encodeURIComponent(p+"_rlsdhm_2026"));}
+function hashPwd(p){ return btoa(encodeURIComponent(p + "_rlschwrr_2026")); }
 
-function getUsers(){
-  var u=lGet("rls_users");
-  if(!u||!Array.isArray(u)||u.length===0){
-    u=[{id:"u_admin",username:"admin",pwd:hashPwd("admin2024"),role:"admin",offices:[]}];
-    lSet("rls_users",u);
-  }
-  return u;
-}
-function saveUsers(users){lSet("rls_users",users);}
-
-function checkSession(){
-  try{
-    var sess=JSON.parse(sessionStorage.getItem("rls_session")||"null");
-    if(sess&&sess.userId){
-      var u=getUsers().find(function(x){return x.id===sess.userId;});
-      if(u){AUTH.loggedIn=true;AUTH.user={id:u.id,username:u.username,role:u.role,offices:u.offices||[],subtypes:u.subtypes||[]};return true;}
-    }
-  }catch(e){}
-  return false;
-}
-
-function doLogin(un,pw,cap){
-  if(parseInt(cap)!==(AUTH.captchaA+AUTH.captchaB)){AUTH.loginError="Security check answer is wrong. Please try again.";return false;}
-  var users=getUsers();
-  var u=users.find(function(x){return x.username===un&&x.pwd===hashPwd(pw);});
-  if(!u){AUTH.loginError="Invalid username or password.";return false;}
-  AUTH.loggedIn=true;AUTH.user={id:u.id,username:u.username,role:u.role,offices:u.offices||[],subtypes:u.subtypes||[]};
-  AUTH.loginError="";
-  sessionStorage.setItem("rls_session",JSON.stringify({userId:u.id}));
-  return true;
-}
-
-function doLogout(){
-  AUTH.loggedIn=false;AUTH.user=null;AUTH.loginUsername="";AUTH.loginPassword="";
-  AUTH.loginCaptcha="";AUTH.loginError="";
-  sessionStorage.removeItem("rls_session");
-  newCaptcha();renderLogin();
-}
-
-function newCaptcha(){
-  AUTH.captchaA=Math.floor(Math.random()*9)+1;
-  AUTH.captchaB=Math.floor(Math.random()*9)+1;
-}
-
-function getVisibleOffices(){
-  var all=lGet("rls_offices")||["DHM"];
-  if(!AUTH.user||AUTH.user.role==="admin")return all;
-  return all.filter(function(o){return AUTH.user.offices.indexOf(o)>=0;});
-}
-function getVisibleSubtypes(){
-  if(!AUTH.user||AUTH.user.role==="admin")return SUBTYPES;
-  var allowed=AUTH.user.subtypes;
-  if(!allowed||allowed.length===0)return SUBTYPES;
-  return SUBTYPES.filter(function(s){return allowed.indexOf(s)>=0;});
-}
-
-/* ── HELPERS ── */
-function sk(s){return s.replace(/[^a-zA-Z0-9]/g,"_");}
-function dim(m){return new Date(S.year,MONTHS.indexOf(m)+1,0).getDate();}
-function SK(o,s){return "rls_stn_"+sk(o)+"_"+sk(s);}
-function TK(o,s,m){return "rls_st_"+sk(o)+"_"+sk(s)+"_"+S.year+"_"+sk(m);}
-function LK(o,s,y,m){return "rls_lock_"+sk(o)+"_"+sk(s)+"_"+y+"_"+sk(m);}
-function lGet(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}}
-function lSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}if(typeof scheduleSave!=="undefined")scheduleSave();}
-function lDel(k){try{localStorage.removeItem(k);}catch(e){}}
-
-function isMonthLocked(month){
-  return lGet(LK(S.office,S.subtype,S.year,month||S.month))===true;
-}
+function SK(office, subtype) { return "stns_" + office + "_" + subtype; }
+function TK(office, subtype, month) { return "status_" + office + "_" + subtype + "_" + month; }
 
 /* ── STATE ── */
-var S={
-  offices:lGet("rls_offices")||["DHM","OHM Dharan"],
-  office:"DHM",subtype:"Hydrological Stations",
-  month:MONTHS[new Date().getMonth()],
-  year:lGet("rls_year")||CUR_YEAR,
-  stns:{},status:{},
-  showManage:false,showAddOff:false,showDelOff:false,showUserMgmt:false,
-  view:"status",
-  invSide:"sat",invAddFor:null,invHistFor:null,invMatchOnly:false,invForm:{},
-  newOff:"",newNo:"",newName:"",newElev:"",newType:"Manual+Automatic",newMed:"GSM",
-  newUsr:{username:"",password:"",role:"dataentry",offices:{},subtypes:{}}
+var S = {
+  offices: lGet("rls_offices") || ["CHWRR", "OHM Dharan"],
+  office: "CHWRR",
+  subtype: "Hydrological Stations",
+  month: MONTHS[new Date().getMonth()],
+  year: lGet("rls_year") || CUR_YEAR,
+  stns: {},
+  status: {},
+  showManage: false,
+  showAddOff: false,
+  showDelOff: false,
+  showUserMgmt: false,
+  view: "status",
+  invSide: "sat",
+  invAddFor: null,
+  invHistFor: null,
+  invMatchOnly: false,
+  invForm: {},
+  newOff: "",
+  newNo: "",
+  newName: "",
+  newElev: "",
+  newType: "Manual+Automatic",
+  newMed: "GSM",
+  newUsr: { username: "", password: "", role: "dataentry", offices: {}, subtypes: {} }
 };
 
 function initStns(){
-  var allOff=lGet("rls_offices")||S.offices;
-  S.offices=allOff;
+  var allOff = lGet("rls_offices") || S.offices;
+  S.offices = allOff;
   allOff.forEach(function(o){
     SUBTYPES.forEach(function(s){
-      var k=SK(o,s);
-      if(S.stns[k]===undefined){
-        var saved=lGet(k);
-        S.stns[k]=saved?saved:(o==="DHM"&&s==="Hydrological Stations"?JSON.parse(JSON.stringify(DEF_HYDRO)):[]);
+      var k = SK(o,s);
+      if(S.stns[k] === undefined){
+        var saved = lGet(k);
+        S.stns[k] = saved ? saved : (o === "CHWRR" && s === "Hydrological Stations" ? JSON.parse(JSON.stringify(DEF_HYDRO)) : []);
       }
     });
   });
 }
 
-function loadStatus(){
-  var k=TK(S.office,S.subtype,S.month);
-  if(S.status[k]===undefined)S.status[k]=lGet(k)||{};
+function getVisibleOffices(){
+  var all = lGet("rls_offices") || ["CHWRR"];
+  if(!AUTH.user || AUTH.user.role === "admin") return all;
+  return all.filter(function(o){ return AUTH.user.offices.indexOf(o) >= 0; });
 }
 
-var _toastTimer=null;
-function flash(msg,err){
-  var t=document.getElementById("toast");if(!t)return;
-  t.innerHTML='<div class="toast '+(err?"toast-err":"toast-ok")+'">'+(err?"⚠ ":"✓ ")+msg+'</div>';
-  if(_toastTimer)clearTimeout(_toastTimer);
-  _toastTimer=setTimeout(function(){t.innerHTML="";},2800);
+function flash(msg, isErr){
+  var el = document.getElementById("flash-banner");
+  el.textContent = msg;
+  el.className = "flash-msg" + (isErr ? " flash-error" : "");
+  el.style.display = "block";
+  setTimeout(function(){ el.style.display = "none"; }, 3000);
 }
 
-/* ── STATUS OPERATIONS ── */
-function setStatus(stnId,day,newVal,forMonth){
-  var month=forMonth||S.month;
-  if(isMonthLocked(month)){flash("🔒 Month is locked. Ask admin to unlock.",true);return;}
-  var k=TK(S.office,S.subtype,month);
-  if(!S.status[k])S.status[k]={};
-  if(!S.status[k][stnId])S.status[k][stnId]={};
-  var old=S.status[k][stnId][day]||"";
-  if(old&&old!==newVal&&(old==="A"||old==="I"||newVal==="A"||newVal==="I")){
-    var oL=S_LBL[old]||old,nL=S_LBL[newVal]||"Clear";
-    if(!confirm("⚠  Confirm Status Change\n\n  From: "+oL+"\n  To:   "+nL+"\n\n  Day "+day+" — "+month+"\n\nAre you sure you want to make this change?"))return;
-  }
-  if(newVal===""){delete S.status[k][stnId][day];}else{S.status[k][stnId][day]=newVal;}
-  lSet(k,S.status[k]);
+function deleteOffice(name){
+  if(!AUTH.user || AUTH.user.role !== "admin"){ flash("Only Admin can delete offices.", true); return; }
+  if(name === "CHWRR"){ flash("Cannot delete the default CHWRR office", true); return; }
+  if(!confirm('Delete office "' + name + '"?\nAll its stations and status data will be removed.')) return;
+  SUBTYPES.forEach(function(s){
+    lDel(SK(name,s)); delete S.stns[SK(name,s)];
+    MONTHS.forEach(function(m){ lDel(TK(name,s,m)); });
+  });
+  var allOff = (lGet("rls_offices") || S.offices).filter(function(o){ return o !== name; });
+  lSet("rls_offices", allOff); S.offices = allOff;
+  if(S.office === name) S.office = allOff[0];
+  S.showDelOff = false; flash('Office "' + name + '" deleted'); render();
+}
+
+function addStation(){
+  if(!S.newNo || !S.newName) { flash("Station Number and Name are required.", true); return; }
+  var k = SK(S.office, S.subtype);
+  var list = S.stns[k] || [];
+  list.push({
+    no: S.newNo,
+    name: S.newName,
+    elev: S.newElev,
+    type: S.newType,
+    med: S.newMed
+  });
+  S.stns[k] = list;
+  lSet(k, list);
+  S.newNo = ""; S.newName = ""; S.newElev = "";
+  flash("Station added successfully");
   render();
 }
 
-function getStnStats(id,forMonth){
-  var month=forMonth||S.month;
-  var k=TK(S.office,S.subtype,month);
-  var st=(S.status[k]&&S.status[k][id])||{};
-  var d=dim(month);var r={A:0,I:0,F:0};
-  for(var day=1;day<=d;day++){var v=st[day]||"";if(r[v]!==undefined)r[v]++;}
-  return r;
-}
-
-function getDayTotals(day,forMonth){
-  var month=forMonth||S.month;
-  var k=TK(S.office,S.subtype,month);
-  var stns=S.stns[SK(S.office,S.subtype)]||[];
-  var r={A:0,I:0,F:0,"-":0};
-  stns.forEach(function(stn){
-    var v=(S.status[k]&&S.status[k][stn.id]&&S.status[k][stn.id][day])||"";
-    if(r[v]!==undefined)r[v]++;
-  });
-  return r;
-}
-
-/* ── STATUS POPUP ── */
-function showStatusPopup(e,stnId,day,forMonth){
-  e.stopPropagation();
-  var month=forMonth||S.month;
-  if(isMonthLocked(month)){flash("🔒 "+month+" is locked. Contact admin.",true);return;}
-  var popup=document.getElementById("status-popup");
-  var rect=e.currentTarget.getBoundingClientRect();
-  popup.style.left=Math.min(rect.left,window.innerWidth-200)+"px";
-  popup.style.top=Math.min(rect.bottom+4,window.innerHeight-230)+"px";
-  popup.style.display="block";
-  popup.innerHTML="";
-  var k=TK(S.office,S.subtype,month);
-  var cur=(S.status[k]&&S.status[k][stnId]&&S.status[k][stnId][day])||"";
-  var title=document.createElement("div");
-  title.className="sp-title";
-  title.textContent=month+" · Day "+day;
-  popup.appendChild(title);
-  var opts=[
-    {v:"A",label:"Active",    color:"#15803d",bg:"#f0fdf4"},
-    {v:"I",label:"Inactive",  color:"#dc2626",bg:"#fef2f2"},
-    {v:"F",label:"Flooded Away",color:"#c2410c",bg:"#fff7ed"},
-    {v:"-",label:"Unchecked", color:"#6b7280",bg:"#f9fafb"},
-    {v:"", label:"Clear",     color:"#94a3b8",bg:"#ffffff"}
-  ];
-  opts.forEach(function(opt){
-    var row=document.createElement("div");
-    var isCur=cur===opt.v;
-    row.className="sp-opt";
-    row.style.background=isCur?opt.bg:"#fff";
-    var dot=document.createElement("span");dot.className="sp-dot";dot.style.background=opt.v?opt.color:"#e2e8f0";
-    var chk=document.createElement("span");chk.className="sp-chk";chk.textContent=isCur?"✓":"";
-    var lbl=document.createElement("span");
-    lbl.style.cssText="color:"+opt.color+";font-weight:"+(isCur?"bold":"normal");
-    lbl.innerHTML=opt.v?"<b>"+opt.v+"</b> — "+opt.label:"∅ Clear";
-    row.appendChild(dot);row.appendChild(chk);row.appendChild(lbl);
-    row.onmouseover=function(){this.style.background=opt.bg;};
-    row.onmouseout=function(){this.style.background=isCur?opt.bg:"#fff";};
-    row.onclick=(function(o,m){return function(ev){
-      ev.stopPropagation();
-      setStatus(stnId,day,o,m);
-      popup.style.display="none";
-    };})(opt.v,month);
-    popup.appendChild(row);
-  });
-}
-
-document.addEventListener("click",function(){
-  var p=document.getElementById("status-popup");if(p)p.style.display="none";
-});
-
-/* ── LOCK / UNLOCK ── */
-function lockMonth(){
-  var k=TK(S.office,S.subtype,S.month);
-  var curSt=S.status[k]||lGet(k)||{};
-  var stns=S.stns[SK(S.office,S.subtype)]||[];
-  var days=dim(S.month);
-
-  var missing=[];
-  stns.forEach(function(stn){
-    var stnSt=curSt[stn.id]||{};
-    var emptyDays=[];
-    for(var d=1;d<=days;d++){
-      var v=stnSt[d];
-      if(!v||v==="")emptyDays.push(d);
-    }
-    if(emptyDays.length>0)missing.push({stn:stn,days:emptyDays});
-  });
-
-  if(missing.length===0){
-    if(!confirm("🔒 Lock "+S.month+" "+S.year+" for "+S.office+"?\n\nAll entries will be READ-ONLY.\nOnly Admin can unlock."))return;
-    lSet(LK(S.office,S.subtype,S.year,S.month),true);
-    flash(S.month+" "+S.year+" is now LOCKED 🔒");render();
-    return;
-  }
-
-  var overlay=document.createElement("div");
-  overlay.className="lock-modal-overlay";
-
-  var modal=document.createElement("div");
-  modal.className="lock-modal";
-
-  var hdr=document.createElement("div");hdr.className="lock-modal-hdr";
-  hdr.innerHTML='<span class="icon">⚠️</span><div><div class="ttl">Incomplete Entries Detected</div>'+
-    '<div class="sub">'+S.month+' '+S.year+' · '+S.office+'</div></div>';
-
-  var body=document.createElement("div");body.className="lock-modal-body";
-  var intro=document.createElement("div");intro.className="lock-warn-intro";
-  intro.innerHTML='<b>'+missing.length+' station'+(missing.length>1?'s have':'has')+' unfilled days</b> in '+
-    S.month+'. Locking will make these permanently read-only until an Admin unlocks the month.';
-  body.appendChild(intro);
-
-  var tbl=document.createElement("table");tbl.className="miss-table";
-  tbl.innerHTML='<thead><tr><th>#</th><th>Station No.</th><th>'+getNameLabel()+'</th>'+
-    '<th>Missing Days</th><th style="text-align:center">Count</th></tr></thead>';
-  var tb=document.createElement("tbody");
-  missing.forEach(function(m,i){
-    var dStr=m.days.length<=10?m.days.join(", "):m.days.slice(0,10).join(", ")+"… ("+m.days.length+" total)";
-    var tr=document.createElement("tr");
-    tr.innerHTML='<td style="color:#94a3b8">'+(i+1)+'</td>'+
-      '<td style="font-family:monospace">'+m.stn.no+'</td>'+
-      '<td>'+m.stn.name+'</td>'+
-      '<td class="miss-days">'+dStr+'</td>'+
-      '<td style="text-align:center;font-weight:bold;color:#dc2626">'+m.days.length+'</td>';
-    tb.appendChild(tr);
-  });
-  tbl.appendChild(tb);body.appendChild(tbl);
-
-  var foot=document.createElement("div");foot.className="lock-modal-foot";
-  var note=document.createElement("div");note.className="warn-note";
-  note.textContent="⚠ You can go back and fill the missing entries, or lock anyway.";
-
-  var cancelB=document.createElement("button");cancelB.className="btn-lock-cancel";
-  cancelB.textContent="← Go Back & Fill";
-  cancelB.onclick=function(){overlay.remove();};
-
-  var forceB=document.createElement("button");forceB.className="btn-lock-force";
-  forceB.textContent="🔒 Lock Anyway";
-  forceB.onclick=function(){
-    overlay.remove();
-    lSet(LK(S.office,S.subtype,S.year,S.month),true);
-    flash(S.month+" "+S.year+" is now LOCKED 🔒 (with missing entries)");render();
-  };
-
-  foot.appendChild(note);foot.appendChild(cancelB);foot.appendChild(forceB);
-  modal.appendChild(hdr);modal.appendChild(body);modal.appendChild(foot);
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
-  overlay.addEventListener("click",function(e){if(e.target===overlay)overlay.remove();});
-}
-function unlockMonth(){
-  if(!AUTH.user||AUTH.user.role!=="admin"){flash("Only Admin can unlock a month.",true);return;}
-  if(!confirm("🔓 Unlock "+S.month+" "+S.year+" for "+S.office+"?\n\nEntries will become editable again."))return;
-  lSet(LK(S.office,S.subtype,S.year,S.month),false);
-  flash(S.month+" "+S.year+" unlocked 🔓");render();
-}
-
-/* ── STATION OPS ── */
-function addStation(){
-  if(!AUTH.user){flash("You must be logged in to add stations.",true);return;}
-  var no=S.newNo.trim(),name=S.newName.trim();
-  if(!no||!name){flash("Enter station number and name",true);return;}
-  var k=SK(S.office,S.subtype);
-  var stn={id:"s"+Date.now(),no:no,name:name,elev:S.newElev.trim(),type:S.newType,medium:S.newMed};
-  S.stns[k]=(S.stns[k]||[]).concat([stn]);lSet(k,S.stns[k]);
-  S.newNo="";S.newName="";S.newElev="";flash('Station "'+name+'" added');render();
-}
-function deleteStation(id){
-  if(!AUTH.user){flash("You must be logged in to remove stations.",true);return;}
-  var k=SK(S.office,S.subtype);
-  S.stns[k]=(S.stns[k]||[]).filter(function(s){return s.id!==id;});lSet(k,S.stns[k]);
-  flash("Station removed");render();
-}
-function editStation(id){
-  if(!AUTH.user){flash("You must be logged in to edit stations.",true);return;}
-  var k=SK(S.office,S.subtype);
-  var stns=S.stns[k]||[];
-  var stn=stns.find(function(s){return s.id===id;});
-  if(!stn)return;
-  var existing=document.getElementById("edit-row-"+id);
-  if(existing){existing.remove();return;}
-  var allRows=document.querySelectorAll(".stn-list tbody tr");
-  var targetRow=null;
-  allRows.forEach(function(r){if(r.getAttribute("data-stn-id")===id)targetRow=r;});
-  if(!targetRow)return;
-  var TYPES2=["Manual+Automatic","Manual","Automatic"];
-  var MEDS2=["GSM","Satellite","N/A"];
-  var editRow=document.createElement("tr");
-  editRow.id="edit-row-"+id;
-  editRow.className="edit-row";
-  var td=document.createElement("td");td.setAttribute("colspan","7");
-  var noI=document.createElement("input");noI.value=stn.no;noI.placeholder="Stn No.";noI.style.width="70px";
-  var nameI=document.createElement("input");nameI.value=stn.name;nameI.placeholder=getNameLabel();nameI.style.width="360px";
-  var elevI=document.createElement("input");elevI.value=stn.elev||"";elevI.placeholder="Elev (m)";elevI.style.width="70px";
-  var typeSel2=document.createElement("select");
-  TYPES2.forEach(function(t){var o=document.createElement("option");o.value=t;o.textContent=t;if(t===stn.type)o.selected=true;typeSel2.appendChild(o);});
-  var medSel2=document.createElement("select");
-  MEDS2.forEach(function(m){var o=document.createElement("option");o.value=m;o.textContent=m;if(m===stn.medium)o.selected=true;medSel2.appendChild(o);});
-  var saveBtn=document.createElement("button");saveBtn.className="btn-save";saveBtn.textContent="💾 Save";
-  var cancelBtn=document.createElement("button");cancelBtn.className="btn-cancel";cancelBtn.textContent="Cancel";
-  saveBtn.onclick=function(){
-    var nn=noI.value.trim(),nm=nameI.value.trim();
-    if(!nn||!nm){flash("Station number and name required",true);return;}
-    var k2=SK(S.office,S.subtype);
-    S.stns[k2]=(S.stns[k2]||[]).map(function(s){
-      if(s.id===id)return{id:s.id,no:nn,name:nm,elev:elevI.value.trim(),type:typeSel2.value,medium:medSel2.value};
-      return s;
-    });
-    lSet(k2,S.stns[k2]);
-    flash('Station "'+nm+'" updated ✓');render();
-  };
-  cancelBtn.onclick=function(){editRow.remove();};
-  var wrap=document.createElement("div");wrap.className="edit-inline";
-  [noI,nameI,elevI,typeSel2,medSel2,saveBtn,cancelBtn].forEach(function(e2){wrap.appendChild(e2);});
-  td.appendChild(wrap);editRow.appendChild(td);
-  targetRow.insertAdjacentElement("afterend",editRow);
-  nameI.focus();
-}
-function addOffice(){
-  if(!AUTH.user||AUTH.user.role!=="admin"){flash("Only Admin can add offices.",true);return;}
-  var name=S.newOff.trim();if(!name)return;
-  var allOff=lGet("rls_offices")||S.offices;
-  if(allOff.indexOf(name)>=0){flash("Office already exists",true);return;}
-  allOff.push(name);lSet("rls_offices",allOff);S.offices=allOff;
-  SUBTYPES.forEach(function(s){S.stns[SK(name,s)]=[];});
-  S.office=name;S.newOff="";S.showAddOff=false;S.showDelOff=false;
-  flash('Office "'+name+'" added');render();
-}
-function deleteOffice(name){
-  if(!AUTH.user||AUTH.user.role!=="admin"){flash("Only Admin can delete offices.",true);return;}
-  if(name==="DHM"){flash("Cannot delete the default DHM office",true);return;}
-  if(!confirm('Delete office "'+name+'"?\nAll its stations and status data will be removed.'))return;
-  SUBTYPES.forEach(function(s){
-    lDel(SK(name,s));delete S.stns[SK(name,s)];
-    MONTHS.forEach(function(m){lDel(TK(name,s,m));});
-  });
-  var allOff=(lGet("rls_offices")||S.offices).filter(function(o){return o!==name;});
-  lSet("rls_offices",allOff);S.offices=allOff;
-  if(S.office===name)S.office=allOff[0];
-  S.showDelOff=false;flash('Office "'+name+'" deleted');render();
-}
-
-/* ── USER MANAGEMENT OPS ── */
-function addUser(){
-  var nu=S.newUsr;
-  if(!nu.username.trim()||!nu.password.trim()){flash("Username and password required",true);return;}
-  var users=getUsers();
-  if(users.find(function(u){return u.username===nu.username.trim();})){flash("Username already exists",true);return;}
-  var selOff=Object.keys(nu.offices).filter(function(o){return nu.offices[o];});
-  var selSub=Object.keys(nu.subtypes).filter(function(s){return nu.subtypes[s];});
-  users.push({id:"u_"+Date.now(),username:nu.username.trim(),pwd:hashPwd(nu.password.trim()),role:nu.role,offices:selOff,subtypes:selSub});
-  saveUsers(users);S.newUsr={username:"",password:"",role:"dataentry",offices:{},subtypes:{}};
-  flash("User '"+nu.username.trim()+"' added");render();
-}
-function deleteUser(id){
-  if(id==="u_admin"){flash("Cannot delete default admin",true);return;}
-  if(AUTH.user&&id===AUTH.user.id){flash("Cannot delete yourself",true);return;}
-  if(!confirm("Delete this user?"))return;
-  saveUsers(getUsers().filter(function(u){return u.id!==id;}));
-  flash("User deleted");render();
-}
-function changeOwnPassword(){
-  var ov=document.createElement("div");
-  ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;";
-  var box=document.createElement("div");
-  box.style.cssText="background:#fff;border-radius:10px;padding:24px 28px;width:340px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.25);";
-  var title=document.createElement("div");
-  title.style.cssText="font-weight:bold;font-size:14px;color:#1a3558;margin-bottom:4px;";
-  title.textContent="Change My Password";
-  var sub=document.createElement("div");
-  sub.style.cssText="font-size:12px;color:#64748b;margin-bottom:16px;";
-  sub.textContent="Logged in as: "+AUTH.user.username;
-  var l1=document.createElement("label");
-  l1.style.cssText="display:block;font-size:11px;font-weight:bold;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;";
-  l1.textContent="Current Password";
-  var cur=document.createElement("input");cur.type="password";cur.placeholder="Enter current password";
-  cur.style.cssText="font-size:13px;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:6px;outline:none;width:100%;margin-bottom:14px;";
-  var l2=document.createElement("label");
-  l2.style.cssText="display:block;font-size:11px;font-weight:bold;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;";
-  l2.textContent="New Password";
-  var np=document.createElement("input");np.type="password";np.placeholder="Enter new password";
-  np.style.cssText="font-size:13px;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:6px;outline:none;width:100%;margin-bottom:16px;";
-  var row=document.createElement("div");row.style.cssText="display:flex;gap:8px;justify-content:flex-end;";
-  var cb=document.createElement("button");cb.textContent="Cancel";
-  cb.style.cssText="padding:8px 16px;background:#f1f5f9;color:#374151;border:1px solid #d1d5db;border-radius:6px;font-size:13px;cursor:pointer;";
-  cb.onclick=function(){ov.remove();};
-  var sbtn=document.createElement("button");sbtn.textContent="Save Password";
-  sbtn.style.cssText="padding:8px 16px;background:#1a3558;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer;";
-  sbtn.onclick=function(){
-    var users=getUsers();
-    var me=users.find(function(x){return x.id===AUTH.user.id;});
-    if(!me){ov.remove();return;}
-    if(me.pwd!==hashPwd(cur.value)){cur.style.borderColor="#dc2626";cur.focus();flash("Current password is incorrect",true);return;}
-    if(!np.value.trim()){np.style.borderColor="#dc2626";np.focus();return;}
-    me.pwd=hashPwd(np.value.trim());saveUsers(users);
-    flash("Your password has been changed ✓");ov.remove();
-  };
-  np.addEventListener("keydown",function(e){if(e.key==="Enter")sbtn.click();if(e.key==="Escape")ov.remove();});
-  cur.addEventListener("keydown",function(e){if(e.key==="Escape")ov.remove();});
-  ov.addEventListener("click",function(e){if(e.target===ov)ov.remove();});
-  row.appendChild(cb);row.appendChild(sbtn);
-  box.appendChild(title);box.appendChild(sub);box.appendChild(l1);box.appendChild(cur);box.appendChild(l2);box.appendChild(np);box.appendChild(row);
-  ov.appendChild(box);document.body.appendChild(ov);
-  setTimeout(function(){cur.focus();},40);
-}
-function resetUserPwd(id){
-  var existing=document.getElementById("pwd-reset-modal");
-  if(existing)existing.remove();
-
-  var users=getUsers();
-  var u=users.find(function(x){return x.id===id;});
-  if(!u)return;
-
-  var overlay=document.createElement("div");
-  overlay.id="pwd-reset-modal";
-  overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;";
-
-  var box=document.createElement("div");
-  box.style.cssText="background:#fff;border-radius:10px;padding:24px 28px;width:340px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.25);";
-
-  var title=document.createElement("div");
-  title.style.cssText="font-weight:bold;font-size:14px;color:#1a3558;margin-bottom:4px;";
-  title.textContent="Reset Password";
-
-  var sub=document.createElement("div");
-  sub.style.cssText="font-size:12px;color:#64748b;margin-bottom:16px;";
-  sub.textContent="Set new password for: "+u.username;
-
-  var lbl=document.createElement("label");
-  lbl.style.cssText="display:block;font-size:11px;font-weight:bold;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;";
-  lbl.textContent="New Password";
-
-  var inp=document.createElement("input");
-  inp.type="password";
-  inp.placeholder="Enter new password";
-  inp.style.cssText="font-size:13px;padding:9px 34px 9px 12px;border:1.5px solid #d1d5db;border-radius:6px;outline:none;width:100%;";
-  inp.addEventListener("focus",function(){inp.style.borderColor="#2563eb";inp.style.boxShadow="0 0 0 3px rgba(37,99,235,.1)";});
-  inp.addEventListener("blur",function(){inp.style.borderColor="#d1d5db";inp.style.boxShadow="none";});
-
-  var wrap=document.createElement("div");wrap.className="pw-wrap";wrap.style.marginBottom="16px";
-
-  var eyeBtn=document.createElement("button");eyeBtn.type="button";eyeBtn.className="pw-eye";
-  eyeBtn.innerHTML="&#128065;";eyeBtn.title="Show / hide password";
-  eyeBtn.onclick=function(){
-    var show=inp.type==="password";
-    inp.type=show?"text":"password";
-    eyeBtn.innerHTML=show?"&#128065;&#x20D7;":"&#128065;";
-    inp.focus();
-  };
-  wrap.appendChild(inp);wrap.appendChild(eyeBtn);
-
-  var btnRow=document.createElement("div");
-  btnRow.style.cssText="display:flex;gap:8px;justify-content:flex-end;";
-
-  var cancelB=document.createElement("button");
-  cancelB.textContent="Cancel";
-  cancelB.style.cssText="padding:8px 16px;background:#f1f5f9;color:#374151;border:1px solid #d1d5db;border-radius:6px;font-size:13px;cursor:pointer;";
-  cancelB.onclick=function(){overlay.remove();};
-
-  var saveB=document.createElement("button");
-  saveB.textContent="Save Password";
-  saveB.style.cssText="padding:8px 16px;background:#1a3558;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer;";
-  saveB.onclick=function(){
-    var np=inp.value.trim();
-    if(!np){inp.style.borderColor="#dc2626";inp.focus();return;}
-    var usrs=getUsers();
-    var uu=usrs.find(function(x){return x.id===id;});
-    if(uu){uu.pwd=hashPwd(np);saveUsers(usrs);flash("Password reset for "+uu.username);}
-    overlay.remove();
-  };
-  inp.addEventListener("keydown",function(e){if(e.key==="Enter")saveB.click();if(e.key==="Escape")overlay.remove();});
-  overlay.addEventListener("click",function(e){if(e.target===overlay)overlay.remove();});
-
-  btnRow.appendChild(cancelB);btnRow.appendChild(saveB);
-  box.appendChild(title);box.appendChild(sub);box.appendChild(lbl);box.appendChild(wrap);box.appendChild(btnRow);
-  overlay.appendChild(box);document.body.appendChild(overlay);
-  setTimeout(function(){inp.focus();},40);
-}
-function updateUserOffices(id,checkEl,office){
-  var users=getUsers();
-  var u=users.find(function(x){return x.id===id;});
-  if(!u)return;
-  if(checkEl.checked){if(u.offices.indexOf(office)<0)u.offices.push(office);}
-  else{u.offices=u.offices.filter(function(o){return o!==office;});}
-  saveUsers(users);flash("Offices updated");
-}
-function updateUserSubtypes(id,checkEl,subtype){
-  var users=getUsers();
-  var u=users.find(function(x){return x.id===id;});
-  if(!u)return;
-  if(!u.subtypes)u.subtypes=[];
-  if(checkEl.checked){if(u.subtypes.indexOf(subtype)<0)u.subtypes.push(subtype);}
-  else{u.subtypes=u.subtypes.filter(function(s){return s!==subtype;});}
-  saveUsers(users);flash("Station type access updated");
-}
-
-/* ── SUMMARY DOWNLOAD ── */
-function downloadSummaryCSV(){
-  var stns=S.stns[SK(S.office,S.subtype)]||[];
-  MONTHS.forEach(function(m){var k=TK(S.office,S.subtype,m);if(S.status[k]===undefined)S.status[k]=lGet(k)||{};});
-  var hdr=["S.N.","Station No.","Station Name"];
-  MONTHS.forEach(function(m){for(var d=1;d<=dim(m);d++)hdr.push(m.substring(0,3)+"-"+d);});
-  hdr=hdr.concat(["Annual A","Annual I","Annual F","Annual -","Remarks"]);
-  var rows=[hdr];
-  stns.forEach(function(stn,idx){
-    var row=[idx+1,stn.no,stn.name];
-    var ann={A:0,I:0,F:0,"-":0};
-    MONTHS.forEach(function(m){
-      var k=TK(S.office,S.subtype,m);var st=(S.status[k]&&S.status[k][stn.id])||{};
-      for(var d=1;d<=dim(m);d++){var v=st[d]||"";row.push(v);if(ann[v]!==undefined)ann[v]++;}
-    });
-    row=row.concat([ann.A,ann.I,ann.F,ann["-"]]);
-    row.push(lGet("rls_rmk_"+sk(S.office)+"_"+sk(S.subtype)+"_"+stn.id)||"");
-    rows.push(row);
-  });
-  var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
-  var a=document.createElement("a");
-  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
-  a.download="Annual_Summary_"+sk(S.office)+"_"+S.year+".csv";a.click();
-}
-
-function downloadMonthCSV(month){
-  var stns=S.stns[SK(S.office,S.subtype)]||[];
-  var k=TK(S.office,S.subtype,month);
-  if(S.status[k]===undefined)S.status[k]=lGet(k)||{};
-  var days=dim(month);
-  var hdr=["S.N.","Station No.",getNameLabel(),"Elevation (m)","Type","Medium"];
-  for(var d=1;d<=days;d++)hdr.push(month.substring(0,3)+"-"+d);
-  hdr=hdr.concat(["Active (A)","Inactive (I)","Flooded Away (F)","Unchecked (-)","Remarks"]);
-  var rows=[hdr];
-  stns.forEach(function(stn,idx){
-    var st=(S.status[k]&&S.status[k][stn.id])||{};
-    var row=[idx+1,stn.no,stn.name,stn.elev||"",stn.type,stn.medium];
-    var cnt={A:0,I:0,F:0,"-":0};
-    for(var d=1;d<=days;d++){var v=st[d]||"";row.push(v);if(cnt[v]!==undefined)cnt[v]++;}
-    row=row.concat([cnt.A,cnt.I,cnt.F,cnt["-"],getRmk(stn.id)]);
-    rows.push(row);
-  });
-  var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
-  var a=document.createElement("a");
-  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
-  a.download="Monthly_"+month+"_"+sk(S.office)+"_"+S.year+".csv";a.click();
-}
-
-function downloadMonthPDF(month){
-  var stns=S.stns[SK(S.office,S.subtype)]||[];
-  var k=TK(S.office,S.subtype,month);
-  if(S.status[k]===undefined)S.status[k]=lGet(k)||{};
-  var days=dim(month);
-
-  var dHdrs="";
-  for(var d=1;d<=days;d++){
-    dHdrs+='<th class="dc">'+d+'</th>';
-  }
-
-  var bodyRows="";
-  stns.forEach(function(stn,idx){
-    var st=(S.status[k]&&S.status[k][stn.id])||{};
-    var cnt={A:0,I:0,F:0,"-":0};
-    var dayCells="";
-    for(var d=1;d<=days;d++){
-      var v=st[d]||"";
-      if(cnt[v]!==undefined)cnt[v]++;
-      var bg=v==="A"?"#d1fae5":v==="I"?"#fee2e2":v==="F"?"#ffedd5":v==="-"?"#f1f5f9":"";
-      var col=v==="A"?"#065f46":v==="I"?"#991b1b":v==="F"?"#9a3412":v==="-"?"#475569":"";
-      dayCells+='<td class="dc" style="background:'+bg+';color:'+col+'">'+( v||"" )+'</td>';
-    }
-    bodyRows+='<tr class="'+(idx%2===0?"":"alt")+'">'+
-      '<td class="c dim">'+(idx+1)+'</td>'+
-      '<td class="c mono">'+stn.no+'</td>'+
-      '<td class="name">'+stn.name+'</td>'+
-      dayCells+
-      '<td class="c act">'+cnt.A+'</td>'+
-      '<td class="c ina">'+cnt.I+'</td>'+
-      '<td class="c fld">'+cnt.F+'</td>'+
-      '<td class="c unc">'+cnt["-"]+'</td></tr>';
-  });
-
-  var totRow='<tr class="tot"><td class="c" colspan="3">Daily Total</td>';
-  for(var d=1;d<=days;d++){
-    var ta=0,ti=0,tf=0,tu=0;
-    stns.forEach(function(stn){
-      var st2=(S.status[k]&&S.status[k][stn.id])||{};
-      var v=st2[d]||"";
-      if(v==="A")ta++;else if(v==="I")ti++;else if(v==="F")tf++;else if(v==="-")tu++;
-    });
-    totRow+='<td class="dc c" style="font-size:7px;line-height:1.1;padding:1px 0">'+
-      '<span style="color:#065f46">'+ta+'</span><br>'+
-      '<span style="color:#991b1b">'+ti+'</span></td>';
-  }
-  totRow+='<td class="c act" style="font-weight:bold">'+stns.reduce(function(s,stn){var st=(S.status[k]&&S.status[k][stn.id])||{};var c=0;for(var d=1;d<=days;d++)if((st[d]||"")==="A")c++;return s+c;},0)+'</td>'+
-    '<td class="c ina" style="font-weight:bold">'+stns.reduce(function(s,stn){var st=(S.status[k]&&S.status[k][stn.id])||{};var c=0;for(var d=1;d<=days;d++)if((st[d]||"")==="I")c++;return s+c;},0)+'</td>'+
-    '<td class="c fld" style="font-weight:bold">'+stns.reduce(function(s,stn){var st=(S.status[k]&&S.status[k][stn.id])||{};var c=0;for(var d=1;d<=days;d++)if((st[d]||"")==="F")c++;return s+c;},0)+'</td>'+
-    '<td class="c unc" style="font-weight:bold">'+stns.reduce(function(s,stn){var st=(S.status[k]&&S.status[k][stn.id])||{};var c=0;for(var d=1;d<=days;d++)if((st[d]||"")==="")c++;return s+c;},0)+'</td></tr>';
-
-  var phtml='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<title>'+month+' '+S.year+' — '+S.office+'</title>'+
-    '<style>'+
-    '*{margin:0;padding:0;box-sizing:border-box}'+
-    'html,body{width:100%;font-family:Arial,sans-serif;font-size:8px}'+
-    'body{padding:6mm}'+
-    '.head{margin-bottom:4px}'+
-    '.head h2{font-size:11px;color:#1a3558;font-weight:bold}'+
-    '.head p{font-size:8px;color:#64748b;margin-top:2px}'+
-    '.legend{display:flex;gap:12px;margin-bottom:5px;font-size:8px}'+
-    '.legend span{display:flex;align-items:center;gap:3px}'+
-    '.lb{display:inline-block;width:8px;height:8px;border-radius:2px}'+
-    'table{border-collapse:collapse;table-layout:fixed;width:100%}'+
-    'th{background:#1a3558;color:#fff;padding:2px 1px;text-align:center;font-size:8px;font-weight:bold;white-space:nowrap;overflow:hidden}'+
-    'th.tleft{text-align:left;padding-left:4px}'+
-    'td{border:1px solid #e2e8f0;vertical-align:middle;overflow:hidden;white-space:nowrap}'+
-    'tr.alt td{background:#f8fafc}'+
-    'tr.tot td{background:#dce7f0;border-top:2px solid #2b4d7c;font-weight:bold}'+
-    '.c{text-align:center;padding:1px}'+
-    '.dc{width:14px;text-align:center;padding:1px 0;font-size:8px;font-weight:bold}'+
-    '.dim{color:#94a3b8;font-size:7px}'+
-    '.mono{font-family:monospace;font-size:8px;text-overflow:ellipsis}'+
-    '.name{padding:1px 4px;font-size:8px;text-overflow:ellipsis}'+
-    '.act{color:#065f46;background:#d1fae5!important;font-weight:bold}'+
-    '.ina{color:#991b1b;background:#fee2e2!important;font-weight:bold}'+
-    '.fld{color:#9a3412;background:#ffedd5!important;font-weight:bold}'+
-    '.unc{color:#475569;background:#f1f5f9!important;font-weight:bold}'+
-    '@page{size:A3 landscape;margin:6mm}'+
-    '@media print{body{padding:0}html{zoom:1}}'+
-    '</style></head>'+
-    '<body>'+
-    '<div class="head">'+
-      '<h2>Monthly Status Report &nbsp;—&nbsp; '+month+' '+S.year+'</h2>'+
-      '<p>'+S.office+' / '+S.subtype+' &nbsp;·&nbsp; '+stns.length+' stations &nbsp;·&nbsp; '+days+' days &nbsp;·&nbsp; Generated: '+new Date().toLocaleDateString()+'</p>'+
-    '</div>'+
-    '<div class="legend">'+
-      '<span><span class="lb" style="background:#d1fae5;border:1px solid #6ee7b7"></span> A = Active</span>'+
-      '<span><span class="lb" style="background:#fee2e2;border:1px solid #fca5a5"></span> I = Inactive</span>'+
-      '<span><span class="lb" style="background:#ffedd5;border:1px solid #fdba74"></span> F = Flooded Away</span>'+
-      '<span><span class="lb" style="background:#f1f5f9;border:1px solid #cbd5e1"></span> - = Unchecked</span>'+
-    '</div>'+
-    '<table>'+
-      '<colgroup>'+
-        '<col style="width:18px">'+
-        '<col style="width:44px">'+
-        '<col style="width:130px">'+
-        '<col style="width:22px">'+
-        '<col style="width:22px">'+
-        '<col style="width:22px">'+
-        '<col style="width:22px">'+
-      '</colgroup>'+
-      '<thead><tr>'+
-        '<th class="tleft">#</th>'+
-        '<th class="tleft">Stn No.</th>'+
-        '<th class="tleft">'+getNameLabel()+'</th>'+
-        dHdrs+
-        '<th style="background:#14532d;color:#bbf7d0">A</th>'+
-        '<th style="background:#7f1d1d;color:#fecaca">I</th>'+
-        '<th style="background:#7c2d12;color:#fed7aa">F</th>'+
-        '<th style="background:#334155;color:#e2e8f0">-</th>'+
-      '</tr></thead>'+
-      '<tbody>'+bodyRows+'</tbody>'+
-      '<tfoot>'+totRow+'</tfoot>'+
-    '</table>'+
-    '<script>setTimeout(function(){window.print();},500);<\/script>'+
-    '</body></html>';
-  var w=window.open("","_blank","width=1400,height=800");
-  if(w){w.document.write(phtml);w.document.close();}
-  else flash("Popup blocked — allow popups to print PDF",true);
-}
-
-function downloadSummaryPDF(){
-  var stns=S.stns[SK(S.office,S.subtype)]||[];
-  MONTHS.forEach(function(m){var k=TK(S.office,S.subtype,m);if(S.status[k]===undefined)S.status[k]=lGet(k)||{};});
-  var mHdrs=MONTHS.map(function(m){return '<th style="background:#1e3d6a;padding:3px 4px;font-size:10px;white-space:nowrap">'+m.substring(0,3)+'<br><span style="font-size:8px;opacity:.7">A/I/F</span></th>';}).join("");
-  var bodyRows="";
-  stns.forEach(function(stn,idx){
-    var ann={A:0,I:0,F:0};var mCells="";
-    MONTHS.forEach(function(m){
-      var k=TK(S.office,S.subtype,m);var st=(S.status[k]&&S.status[k][stn.id])||{};
-      var c={A:0,I:0,F:0};
-      for(var d=1;d<=dim(m);d++){var v=st[d]||"";if(c[v]!==undefined){c[v]++;ann[v]++;}}
-      var bg=c.A>c.I?"#f0fdf4":(c.I>0?"#fef2f2":"");
-      mCells+='<td style="text-align:center;padding:3px 2px;font-size:10px;background:'+bg+'">'+
-        '<span style="color:#15803d">'+c.A+'</span>'+(c.I?'/<span style="color:#dc2626">'+c.I+'</span>':'/0')+
-        (c.F?'/<span style="color:#c2410c">'+c.F+'</span>':'')+'</td>';
-    });
-    bodyRows+='<tr style="background:'+(idx%2===0?"#fff":"#f8fafc")+'">'+
-      '<td style="padding:3px 5px;text-align:center;color:#94a3b8;font-size:10px">'+(idx+1)+'</td>'+
-      '<td style="padding:3px 5px;font-family:monospace;font-size:10px">'+stn.no+'</td>'+
-      '<td style="padding:3px 6px;font-size:11px">'+stn.name+'</td>'+
-      mCells+
-      '<td style="text-align:center;padding:3px;color:#15803d;font-weight:bold;font-size:11px">'+ann.A+'</td>'+
-      '<td style="text-align:center;padding:3px;color:#dc2626;font-weight:bold;font-size:11px">'+ann.I+'</td>'+
-      '<td style="text-align:center;padding:3px;color:#c2410c;font-weight:bold;font-size:11px">'+ann.F+'</td></tr>';
-  });
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Annual Summary '+S.office+' '+S.year+'</title>'+
-    '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;font-size:11px;padding:10px}'+
-    'h2{font-size:14px;color:#1a3558;margin-bottom:3px}p{font-size:10px;color:#64748b;margin-bottom:8px}'+
-    'table{border-collapse:collapse;width:100%}th{background:#2b4d7c;color:#fff;padding:4px 5px;text-align:center;font-size:10px}'+
-    'td{border-bottom:1px solid #e8edf3;vertical-align:middle}th.tleft,td.tleft{text-align:left}'+
-    '@page{size:A3 landscape;margin:1cm}@media print{body{padding:0}}</style></head>'+
-    '<body><h2>Annual Summary — '+S.office+' / '+S.subtype+'</h2>'+
-    '<p>Year: '+S.year+' &nbsp;·&nbsp; Generated: '+new Date().toLocaleDateString()+'&nbsp;·&nbsp; '+stns.length+' stations</p>'+
-    '<table><thead><tr>'+
-    '<th style="width:28px">#</th><th class="tleft" style="width:55px">Stn No.</th>'+
-    '<th class="tleft" style="min-width:140px">'+getNameLabel()+'</th>'+
-    mHdrs+
-    '<th style="color:#4ade80;background:#1a3558">A</th>'+
-    '<th style="color:#f87171;background:#1a3558">I</th>'+
-    '<th style="color:#fb923c;background:#1a3558">F</th></tr></thead>'+
-    '<tbody>'+bodyRows+'</tbody></table>'+
-    '<script>setTimeout(function(){window.print();},400);<\/script></body></html>';
-  var w=window.open("","_blank","width=1300,height=750");
-  if(w){w.document.write(html);w.document.close();}
-  else flash("Popup blocked — allow popups to print PDF",true);
-}
-
-/* ── DOM BUILDER ── */
-function el(tag,attrs,children){
-  var elem=document.createElement(tag);
-  if(attrs){
-    if(Array.isArray(attrs)){children=attrs;attrs=null;}
-    else{
-      Object.keys(attrs).forEach(function(k){
-        if(k==="cls")elem.className=attrs[k];
-        else if(k==="style")elem.style.cssText=attrs[k];
-        else if(k==="onclick")elem.onclick=attrs[k];
-        else if(k==="onchange")elem.onchange=attrs[k];
-        else if(k==="oninput")elem.oninput=attrs[k];
-        else if(k==="onkeydown")elem.onkeydown=attrs[k];
-        else elem.setAttribute(k,attrs[k]);
-      });
-    }
-  }
-  if(children){
-    (Array.isArray(children)?children:[children]).forEach(function(c){
-      if(c==null)return;
-      if(typeof c==="string"||typeof c==="number")elem.appendChild(document.createTextNode(String(c)));
-      else elem.appendChild(c);
-    });
-  }
-  return elem;
-}
-function txt(s){return document.createTextNode(s);}
-
-function getNameLabel(){
-  if(S.subtype==="Snow Stations — AWS")return "Name / AWS Location";
-  if(S.subtype==="Snow Stations — Glacier Camera")return "Name / Glacier Camera Location";
-  return "Name / River";
-}
-
-function rmkKey(stnId){return "rls_mrmk_"+sk(S.office)+"_"+sk(S.subtype)+"_"+S.year+"_"+sk(S.month)+"_"+stnId;}
-function getRmk(stnId){return lGet(rmkKey(stnId))||"";}
-function setRmk(stnId,val){
-  if(val)lSet(rmkKey(stnId),val);
-  else{try{localStorage.removeItem(rmkKey(stnId));}catch(e){}}
-}
-
-function pwWrap(inp){
-  var wrap=document.createElement("div");wrap.className="pw-wrap";
-  var btn=document.createElement("button");btn.type="button";btn.className="pw-eye";
-  btn.title="Show / hide password";
-  btn.innerHTML="&#128065;";
-  btn.onclick=function(){
-    var show=inp.type==="password";
-    inp.type=show?"text":"password";
-    btn.innerHTML=show?"&#128065;&#x20D7;":"&#128065;";
-    btn.title=show?"Hide password":"Show password";
-    inp.focus();
-  };
-  wrap.appendChild(inp);wrap.appendChild(btn);
-  return wrap;
-}
-function mkSel(opts,val,cls,onchange){
-  var s=el("select",{cls:cls,onchange:onchange});
-  opts.forEach(function(o){
-    var v=typeof o==="object"?o.value:o,l=typeof o==="object"?o.label:o;
-    var op=el("option",{value:v},[l]);if(v===val)op.selected=true;s.appendChild(op);
-  });
-  return s;
-}
-
-function mkSubtypeSel(val,onchange){
-  var s=document.createElement("select");
-  s.className="hdr-sel";s.onchange=onchange;
-  SUBTYPE_GROUPS.forEach(function(grp){
-    if(grp.options.length===1){
-      var op=document.createElement("option");
-      op.value=grp.options[0];op.textContent=grp.options[0];
-      if(grp.options[0]===val)op.selected=true;
-      s.appendChild(op);
-    }else{
-      var og=document.createElement("optgroup");
-      og.label=grp.label;
-      grp.options.forEach(function(o){
-        var op=document.createElement("option");
-        op.value=o;
-        op.textContent=o;
-        if(o===val)op.selected=true;
-        og.appendChild(op);
-      });
-      s.appendChild(og);
-    }
-  });
-  return s;
-}
-
-/* ── RENDER LOGIN ── */
-function renderLogin(){
-  document.body.style.padding="0";
-  var appEl=document.getElementById("app");
-  appEl.style.cssText="background:none;box-shadow:none;border-radius:0;overflow:visible";
-  appEl.innerHTML="";
-  var wrap=el("div",{cls:"login-page"});
-  var card=el("div",{cls:"login-card"});
-  card.appendChild(el("div",{cls:"login-header"},[
-    el("div",{cls:"login-logo"},["🌊"]),
-    el("div",{cls:"login-title"},["DHM RLS Station Daily Status Register"]),
-    el("div",{cls:"login-sub"},["Department of Hydrology & Meteorology · Nepal\nSecure access — authorised users only"])
-  ]));
-  var body=el("div",{cls:"login-body"});
-  if(AUTH.loginError)body.appendChild(el("div",{cls:"login-err"},[AUTH.loginError]));
-  var unI=el("input",{type:"text",placeholder:"Enter username",value:AUTH.loginUsername,
-    oninput:function(){AUTH.loginUsername=this.value;},
-    onkeydown:function(e){if(e.key==="Enter")attemptLogin();}});
-  var pwI=el("input",{type:"password",placeholder:"Enter password",value:AUTH.loginPassword,
-    oninput:function(){AUTH.loginPassword=this.value;},
-    onkeydown:function(e){if(e.key==="Enter")attemptLogin();}});
-  var capI=el("input",{type:"number",placeholder:"Your answer",value:AUTH.loginCaptcha,
-    style:"width:100%;text-align:center;font-size:16px;font-weight:bold;letter-spacing:2px",
-    oninput:function(){AUTH.loginCaptcha=this.value;},
-    onkeydown:function(e){if(e.key==="Enter")attemptLogin();}});
-  body.appendChild(el("div",{cls:"lf"},[el("label",[txt("Username")]),unI]));
-  body.appendChild(el("div",{cls:"lf"},[el("label",[txt("Password")]),pwWrap(pwI)]));
-  body.appendChild(el("div",{cls:"lf"},[
-    el("label",[txt("Security Check")]),
-    el("div",{cls:"captcha-box"},[AUTH.captchaA+"  +  "+AUTH.captchaB+"  =  ?"]),
-    capI
-  ]));
-  body.appendChild(el("button",{cls:"btn-login",onclick:attemptLogin},["Sign In →"]));
-  body.appendChild(el("div",{cls:"login-hint"},["Default admin login:  admin  /  admin2024"]));
-  card.appendChild(body);wrap.appendChild(card);appEl.appendChild(wrap);
-  setTimeout(function(){unI.focus();},60);
-}
-
-function attemptLogin(){
-  if(doLogin(AUTH.loginUsername,AUTH.loginPassword,AUTH.loginCaptcha)){
-    document.body.style.padding="16px";
-    var appEl=document.getElementById("app");
-    appEl.style.cssText="";
-    if(typeof gsLoad!=="undefined"){
-      gsLoad(function(){render();if(typeof startAutoRefresh!=="undefined")startAutoRefresh();});
-    }else{render();}
-  }else{newCaptcha();AUTH.loginCaptcha="";renderLogin();}
-}
-
-/* ── RENDER USER PANEL ── */
-function renderUserPanel(app){
-  if(!AUTH.user||AUTH.user.role!=="admin")return;
-  var allOffices=lGet("rls_offices")||S.offices;
-  var users=getUsers();
-  var panel=el("div",{cls:"user-mgmt-panel"});
-  panel.appendChild(el("div",{cls:"manage-title"},["👥 User Management — Roles, Offices & Station Type Access"]));
-
-  var nu=S.newUsr;
-  var unI=el("input",{type:"text",placeholder:"Username",value:nu.username,
-    oninput:function(){S.newUsr.username=this.value;}});
-  var pwI=el("input",{type:"password",placeholder:"Password",value:nu.password,
-    oninput:function(){S.newUsr.password=this.value;}});
-  var roleS=mkSel(
-    [{value:"dataentry",label:"Data Entry"},{value:"admin",label:"Admin"}],
-    nu.role,"",
-    function(){S.newUsr.role=this.value;render();}
-  );
-  var offChecks=el("div",{cls:"off-checks"});
-  allOffices.forEach(function(o){
-    var chk=el("input",{type:"checkbox"});chk.checked=!!nu.offices[o];
-    (function(off){chk.onchange=function(){S.newUsr.offices[off]=this.checked;};})(o);
-    offChecks.appendChild(el("label",[chk,txt(" "+o)]));
-  });
-  var subChecksNew=el("div",{cls:"sub-checks"});
-  SUBTYPES.forEach(function(st){
-    var isSnow=st.indexOf("Snow")>=0;
-    var chk=el("input",{type:"checkbox"});chk.checked=!!nu.subtypes[st];
-    (function(s){chk.onchange=function(){S.newUsr.subtypes[s]=this.checked;};})(st);
-    var lbl=el("label",{cls:isSnow?"snow":""},[chk,txt(" "+st.replace("Snow Stations — ","❄ ").replace("Hydrological Stations","🌊 Hydrological"))]);
-    subChecksNew.appendChild(lbl);
-  });
-  panel.appendChild(el("div",{cls:"user-form"},[
-    el("div",{cls:"fld"},[el("label",[txt("Username")]),unI]),
-    el("div",{cls:"fld"},[el("label",[txt("Password")]),pwWrap(pwI)]),
-    el("div",{cls:"fld"},[el("label",[txt("Role")]),roleS]),
-    el("div",{cls:"fld"},[
-      el("label",[txt("Assign Offices")]),
-      nu.role==="admin"
-        ?el("span",{style:"font-size:11px;color:#64748b;padding-top:5px;display:block"},["Admin can access all offices"])
-        :offChecks
-    ]),
-    el("div",{cls:"fld"},[
-      el("label",[txt("Station Type Access")]),
-      nu.role==="admin"
-        ?el("span",{style:"font-size:11px;color:#64748b;padding-top:5px;display:block"},["Admin can access all station types"])
-        :subChecksNew
-    ]),
-    el("button",{cls:"btn-stn-add",onclick:addUser},["+ Add User"])
-  ]));
-
-  var tbody=el("tbody");
-  users.forEach(function(u){
-    var isMe=AUTH.user.id===u.id;
-    var offEdit=el("div",{cls:"off-checks"});
-    if(u.role!=="admin"){
-      allOffices.forEach(function(o){
-        var chk=el("input",{type:"checkbox"});
-        chk.checked=!!(u.offices&&u.offices.indexOf(o)>=0);
-        (function(uid,off,c){c.onchange=function(){updateUserOffices(uid,c,off);};})(u.id,o,chk);
-        offEdit.appendChild(el("label",[chk,txt(" "+o)]));
-      });
-    }else{
-      offEdit=el("span",{style:"font-size:11px;color:#64748b;font-style:italic"},["All offices"]);
-    }
-    var subEdit=el("div",{cls:"sub-checks"});
-    if(u.role!=="admin"){
-      SUBTYPES.forEach(function(st){
-        var isSnow=st.indexOf("Snow")>=0;
-        var chk=el("input",{type:"checkbox"});
-        var userSubs=u.subtypes||[];
-        chk.checked=userSubs.length===0||userSubs.indexOf(st)>=0;
-        (function(uid,s,c){c.onchange=function(){updateUserSubtypes(uid,c,s);};})(u.id,st,chk);
-        var shortName=st.replace("Snow Stations — ","❄ ").replace("Hydrological Stations","🌊 Hydro");
-        subEdit.appendChild(el("label",{cls:isSnow?"snow":""},[chk,txt(" "+shortName)]));
-      });
-    }else{
-      subEdit=el("span",{style:"font-size:11px;color:#64748b;font-style:italic"},["All types"]);
-    }
-    var actTd=el("td",{style:"text-align:center;white-space:nowrap"});
-    if(!(u.id==="u_admin"&&isMe)){
-      if(!isMe)actTd.appendChild(el("button",{cls:"btn-sm btn-sm-red",style:"margin-right:4px",
-        onclick:(function(id){return function(){deleteUser(id);};})(u.id)},["✕ Del"]));
-      actTd.appendChild(el("button",{cls:"btn-sm btn-sm-blue",
-        onclick:(function(id){return function(){resetUserPwd(id);};})(u.id)},["🔑 Reset Pwd"]));
-    }
-    tbody.appendChild(el("tr",[
-      el("td",{style:"font-weight:bold"},[u.username+(isMe?" 👤":""),(u.id==="u_admin"?el("span",{style:"font-size:10px;color:#94a3b8;margin-left:4px"},["(default)"]):"")]),
-      el("td",{style:"text-align:center"},[el("span",{cls:"role-pill "+(u.role==="admin"?"role-admin":"role-de")},[u.role==="admin"?"Admin":"Data Entry"])]),
-      el("td",[offEdit]),
-      el("td",[subEdit]),
-      actTd
-    ]));
-  });
-  panel.appendChild(el("div",{cls:"user-list-wrap"},[
-    el("table",[
-      el("thead",[el("tr",[
-        el("th",{style:"text-align:left"},["Username"]),
-        el("th",["Role"]),
-        el("th",{style:"text-align:left"},["Assigned Offices"]),
-        el("th",{style:"text-align:left"},["Station Type Access"]),
-        el("th",["Actions"])
-      ])]),
-      tbody
-    ])
-  ]));
-  app.appendChild(panel);
-}
-
-/* ── BUILD MONTH SECTION (for Annual Summary) ── */
-function buildMonthSection(month,stns){
-  var k=TK(S.office,S.subtype,month);
-  if(S.status[k]===undefined)S.status[k]=lGet(k)||{};
-  var d=dim(month);
-  var locked=isMonthLocked(month);
-  var section=el("div",{cls:"sum-section"});
-  section.appendChild(el("div",{cls:"sum-sec-hdr"},[
-    el("span",[month+" "+S.year]),
-    el("span",{style:"font-size:10px;opacity:.75"},[d+" days"+(locked?" · 🔒":"")])
-  ]));
-  var tbl=el("table",{cls:"sum-month"});
-  var hr=el("tr");
-  hr.appendChild(el("th",{cls:"tleft",style:"width:20px"},["#"]));
-  hr.appendChild(el("th",{cls:"tleft",style:"min-width:100px"},["Station"]));
-  for(var i=1;i<=d;i++)hr.appendChild(el("th",[String(i)]));
-  hr.appendChild(el("th",{style:"color:#4ade80"},["A"]));
-  hr.appendChild(el("th",{style:"color:#f87171"},["I"]));
-  hr.appendChild(el("th",{style:"color:#fb923c"},["F"]));
-  tbl.appendChild(el("thead",[hr]));
-  var tbody=el("tbody");
-  stns.forEach(function(stn,idx){
-    var stnSt=(S.status[k]&&S.status[k][stn.id])||{};
-    var tr=el("tr");
-    tr.appendChild(el("td",{style:"text-align:center;color:#94a3b8;padding:2px 3px"},[String(idx+1)]));
-    var nc=el("td",{style:"padding:2px 6px;white-space:nowrap;overflow:hidden;max-width:100px;font-size:10px"});
-    nc.title=stn.name+" ("+stn.no+")";nc.textContent=stn.no+" "+stn.name;tr.appendChild(nc);
-    var cnt={A:0,I:0,F:0};
-    for(var day=1;day<=d;day++){
-      (function(dy){
-        var v=stnSt[dy]||"";
-        var td=el("td",{cls:"mtick"});
-        if(v&&S_BG[v]){td.style.background=S_BG[v];td.style.color=S_CLR[v];td.textContent=v;if(cnt[v]!==undefined)cnt[v]++;}
-        td.title=month+" Day "+dy+(v?" : "+(S_LBL[v]||v):" : empty");
-        if(!locked){(function(id,m){td.onclick=function(e){showStatusPopup(e,id,dy,m);};})(stn.id,month);}
-        else{td.style.cursor="not-allowed";td.title+=" [LOCKED]";}
-        tr.appendChild(td);
-      })(day);
-    }
-    tr.appendChild(el("td",{cls:"mcnt",style:"color:#15803d"},[cnt.A||""]));
-    tr.appendChild(el("td",{cls:"mcnt",style:"color:#dc2626"},[cnt.I||""]));
-    tr.appendChild(el("td",{cls:"mcnt",style:"color:#c2410c"},[cnt.F||""]));
-    tbody.appendChild(tr);
-  });
-  var fr=el("tr");
-  fr.appendChild(el("td",{style:"background:#dce7f0"},[""]));
-  fr.appendChild(el("td",{style:"background:#dce7f0;font-weight:bold;padding:2px 6px;font-size:9px;color:#1a3558"},["Day Total"]));
-  for(var day=1;day<=d;day++){
-    var dt={A:0,I:0,F:0};
-    stns.forEach(function(stn){var v=(S.status[k]&&S.status[k][stn.id]&&S.status[k][stn.id][day])||"";if(dt[v]!==undefined)dt[v]++;});
-    var tdF=el("td",{style:"text-align:center;background:#dce7f0;font-size:9px"});
-    var dom="A",mx=0;
-    Object.keys(dt).forEach(function(c){if(dt[c]>mx){mx=dt[c];dom=c;}});
-    if(mx>0){tdF.style.color=S_CLR[dom];tdF.style.fontWeight="bold";tdF.textContent=String(mx);}
-    fr.appendChild(tdF);
-  }
-  fr.appendChild(el("td",{style:"background:#dce7f0"},[""]));
-  fr.appendChild(el("td",{style:"background:#dce7f0"},[""]));
-  fr.appendChild(el("td",{style:"background:#dce7f0"},[""]));
-  tbl.appendChild(tbody);tbl.appendChild(el("tfoot",[fr]));
-  section.appendChild(el("div",{cls:"sum-sec-body"},[tbl]));
-  return section;
-}
-
-/* ── RENDER ANNUAL SUMMARY ── */
-function renderSummary(app){
-  var stns=S.stns[SK(S.office,S.subtype)]||[];
-  var wrap=el("div",{cls:"summary-wrap"});
-  var bar=el("div",{cls:"sum-action-bar"});
-  bar.appendChild(el("div",{cls:"sum-info"},[
-    txt("Annual summary — "),el("b",[S.office]),txt(" / "),el("b",[S.subtype]),txt(" · "+S.year+" · "+stns.length+" stations")
-  ]));
-  (function(){
-    var wrap=document.createElement("div");wrap.className="dl-wrap";
-    var btn=document.createElement("button");btn.className="btn-dl-drop";
-    btn.innerHTML="⬇ CSV ▾";
-    var menu=document.createElement("div");menu.className="dl-menu";
-    var secAnnual=document.createElement("div");secAnnual.className="dl-menu-section";
-    secAnnual.textContent="Full Year";
-    menu.appendChild(secAnnual);
-    var annRow=document.createElement("div");annRow.className="dl-menu-item";
-    annRow.innerHTML='<span class="mi-icon">📊</span>'+
-      '<span class="mi-label">Annual Summary CSV<span class="mi-sub">All 12 months · '+S.year+'</span></span>'+
-      '<span class="mi-badge mi-badge-annual">Annual</span>';
-    annRow.onclick=function(){downloadSummaryCSV();menu.classList.remove("open");};
-    menu.appendChild(annRow);
-    var divider=document.createElement("div");divider.className="dl-menu-divider";
-    menu.appendChild(divider);
-    var secMonth=document.createElement("div");secMonth.className="dl-menu-section";
-    secMonth.textContent="Individual Month";
-    menu.appendChild(secMonth);
-    var mWrap=document.createElement("div");mWrap.className="dl-menu-months";
-    MONTHS.forEach(function(m){
-      var k=TK(S.office,S.subtype,m);
-      var st=lGet(k)||{};
-      var hasData=Object.keys(st).length>0;
-      var item=document.createElement("div");item.className="dl-menu-item";
-      item.innerHTML='<span class="mi-icon">📅</span>'+
-        '<span class="mi-label'+(hasData?"":" dl-no-data")+'">'+m+
-        '<span class="mi-sub">'+(hasData?dim(m)+' days':'no data yet')+'</span></span>'+
-        '<span class="mi-badge mi-badge-month">CSV</span>';
-      item.onclick=(function(mo){return function(){downloadMonthCSV(mo);menu.classList.remove("open");};})(m);
-      mWrap.appendChild(item);
-    });
-    menu.appendChild(mWrap);
-    btn.onclick=function(e){e.stopPropagation();
-      document.querySelectorAll(".dl-menu.open").forEach(function(x){x.classList.remove("open");});
-      menu.classList.toggle("open");
-    };
-    wrap.appendChild(btn);wrap.appendChild(menu);
-    bar.appendChild(wrap);
-  })();
-
-  (function(){
-    var wrap=document.createElement("div");wrap.className="dl-wrap";
-    var btn=document.createElement("button");btn.className="btn-dl-drop red";
-    btn.innerHTML="🖨 PDF ▾";
-    var menu=document.createElement("div");menu.className="dl-menu";
-    var secAnnual=document.createElement("div");secAnnual.className="dl-menu-section";
-    secAnnual.textContent="Full Year";
-    menu.appendChild(secAnnual);
-    var annRow=document.createElement("div");annRow.className="dl-menu-item pdf-item";
-    annRow.innerHTML='<span class="mi-icon">📋</span>'+
-      '<span class="mi-label">Annual Summary PDF<span class="mi-sub">All 12 months · '+S.year+'</span></span>'+
-      '<span class="mi-badge mi-badge-annual">Annual</span>';
-    annRow.onclick=function(){downloadSummaryPDF();menu.classList.remove("open");};
-    menu.appendChild(annRow);
-    var divider=document.createElement("div");divider.className="dl-menu-divider";
-    menu.appendChild(divider);
-    var secMonth=document.createElement("div");secMonth.className="dl-menu-section";
-    secMonth.textContent="Individual Month";
-    menu.appendChild(secMonth);
-    var mWrap=document.createElement("div");mWrap.className="dl-menu-months";
-    MONTHS.forEach(function(m){
-      var k=TK(S.office,S.subtype,m);
-      var st=lGet(k)||{};
-      var hasData=Object.keys(st).length>0;
-      var item=document.createElement("div");item.className="dl-menu-item pdf-item";
-      item.innerHTML='<span class="mi-icon">🗓</span>'+
-        '<span class="mi-label'+(hasData?"":" dl-no-data")+'">'+m+
-        '<span class="mi-sub">'+(hasData?dim(m)+' days — print/save PDF':'no data yet')+'</span></span>'+
-        '<span class="mi-badge mi-badge-month">PDF</span>';
-      item.onclick=(function(mo){return function(){downloadMonthPDF(mo);menu.classList.remove("open");};})(m);
-      mWrap.appendChild(item);
-    });
-    menu.appendChild(mWrap);
-    btn.onclick=function(e){e.stopPropagation();
-      document.querySelectorAll(".dl-menu.open").forEach(function(x){x.classList.remove("open");});
-      menu.classList.toggle("open");
-    };
-    wrap.appendChild(btn);wrap.appendChild(menu);
-    bar.appendChild(wrap);
-  })();
-
-  document.addEventListener("click",function(){
-    document.querySelectorAll(".dl-menu.open").forEach(function(x){x.classList.remove("open");});
-  });
-  wrap.appendChild(bar);
-  if(stns.length===0){wrap.appendChild(el("div",{cls:"no-data-msg"},["No stations added yet."]));app.appendChild(wrap);return;}
-  var grid=el("div",{cls:"sum-grid"});
-  MONTHS.forEach(function(m){grid.appendChild(buildMonthSection(m,stns));});
-  wrap.appendChild(grid);app.appendChild(wrap);
-}
-
-/* ════════════════════════════════════════
-   RIVER WATCH SYNC (live DHM data via BIPAD open API)
-════════════════════════════════════════ */
-var RW_API="https://bipadportal.gov.np/api/v1/river/?format=json&limit=-1";
-
-function rwMapKey(){return "rls_rwmap_"+sk(S.office)+"_"+sk(S.subtype);}
-
-function rwFetch(cb){
-  // Try direct first; if browser CORS blocks it, fall back to public CORS proxies.
-  var tries=[
-    RW_API,
-    "https://api.allorigins.win/raw?url="+encodeURIComponent(RW_API),
-    "https://corsproxy.io/?url="+encodeURIComponent(RW_API)
-  ];
-  var i=0;
-  (function next(){
-    if(i>=tries.length){cb(null,"Could not reach the River Watch data feed. This can happen if the DHM/BIPAD server is down, or the network blocks it. Please try again later.");return;}
-    var u=tries[i++];
-    fetch(u,{method:"GET"})
-      .then(function(r){if(!r.ok)throw 0;return r.json();})
-      .then(function(j){
-        var list=(j&&(j.results||j.data))||(Array.isArray(j)?j:[]);
-        if(!Array.isArray(list)||list.length===0)throw 0;
-        var out=list.map(function(r){
-          var wl=r.waterLevel||r.water_level||null;
-          return{
-            id:r.id,
-            title:String(r.title||r.name||"").trim(),
-            basin:r.basin||"",
-            status:r.status||"",
-            value:(wl&&wl.value!=null)?wl.value:null,
-            when:(wl&&(wl.datetime||wl.dateTime||wl.date))||r.modifiedOn||r.createdOn||null
-          };
-        }).filter(function(x){return x.title;});
-        if(out.length===0)throw 0;
-        out.sort(function(a,b){return a.title<b.title?-1:1;});
-        cb(out,null);
-      })
-      .catch(function(){next();});
-  })();
-}
-
-/* fuzzy name matching between app stations and feed titles */
-function rwNorm(s){
-  return String(s||"").toLowerCase()
-    .replace(/\(.*?\)/g," ")
-    .replace(/[^a-z0-9 ]/g," ")
-    .replace(/\b(river|khola|nadi|nala|nadee|at|the|hs|rls|aws|station|bridge|gad|gaon|gau)\b/g," ")
-    .replace(/\s+/g," ").trim();
-}
-function rwScore(a,b){
-  if(!a||!b)return 0;
-  if(a===b)return 1;
-  if(a.indexOf(b)>=0||b.indexOf(a)>=0)return .85;
-  var ta=a.split(" "),tb=b.split(" "),hit=0;
-  ta.forEach(function(t){if(t.length>2&&tb.indexOf(t)>=0)hit++;});
-  return hit/Math.max(ta.length,tb.length);
-}
-function rwHoursAgo(iso){
-  if(!iso)return null;
-  var t=new Date(iso);
-  if(isNaN(t.getTime()))return null;
-  return (Date.now()-t.getTime())/3600000;
-}
-function rwFmtAgo(h){
-  if(h==null)return "no data";
-  if(h<1)return Math.round(h*60)+" min ago";
-  if(h<48)return Math.round(h)+" h ago";
-  return Math.round(h/24)+" d ago";
-}
-
-function openRiverWatchSync(){
-  var overlay=document.createElement("div");overlay.className="lock-modal-overlay";
-  var modal=document.createElement("div");modal.className="rw-modal";
-  var hdr=document.createElement("div");hdr.className="lock-modal-hdr";
-  hdr.innerHTML='<span class="icon">🌐</span><div><div class="ttl">River Watch Sync — live station status</div>'+
-    '<div class="sub">DHM real-time river data (via BIPAD open API) · '+S.office+' / '+S.subtype+'</div></div>';
-  var body=document.createElement("div");body.className="rw-body";
-  body.innerHTML='<div class="rw-loading">⏳ Fetching live data from River Watch feed…</div>';
-  var foot=document.createElement("div");foot.className="lock-modal-foot";
-  var closeB=document.createElement("button");closeB.className="btn-lock-cancel";closeB.textContent="Close";
-  closeB.onclick=function(){overlay.remove();};
-  foot.appendChild(closeB);
-  modal.appendChild(hdr);modal.appendChild(body);modal.appendChild(foot);
-  overlay.appendChild(modal);document.body.appendChild(overlay);
-  overlay.addEventListener("click",function(e){if(e.target===overlay)overlay.remove();});
-
-  rwFetch(function(feed,err){
-    if(!document.body.contains(overlay))return;
-    if(err){body.innerHTML='<div class="rw-err">⚠ '+err+'</div>';return;}
-    buildRwUI(feed);
-  });
-
-  function buildRwUI(feed){
-    body.innerHTML="";
-    var stns=S.stns[SK(S.office,S.subtype)]||[];
-    var savedMap=lGet(rwMapKey())||{};
-    var feedNorm=feed.map(function(f){return rwNorm(f.title);});
-    var now=new Date();
-    var realMonth=MONTHS[now.getMonth()],realYear=now.getFullYear(),realDay=now.getDate();
-
-    /* options bar */
-    var thSel=document.createElement("select");
-    [["6","≤ 6 hours"],["12","≤ 12 hours"],["24","≤ 24 hours"],["48","≤ 48 hours"]].forEach(function(o){
-      var op=document.createElement("option");op.value=o[0];op.textContent=o[1];
-      if(o[0]==="24")op.selected=true;thSel.appendChild(op);
-    });
-    var owChk=document.createElement("input");owChk.type="checkbox";
-    var opts=el("div",{cls:"rw-opts"},[
-      el("label",[txt("Mark Active if last data is "),thSel]),
-      el("label",[owChk,txt("Overwrite cells that already have a status")]),
-      el("span",{style:"font-size:11px;color:#64748b;margin-left:auto"},[feed.length+" stations live on River Watch"])
-    ]);
-    body.appendChild(opts);
-    body.appendChild(el("div",{cls:"rw-note"},[
-      "Will fill Day "+realDay+" of "+realMonth+" "+realYear+
-      (isMonthLocked(realMonth)&&S.year===realYear?" — ⚠ that month is LOCKED, unlock it first.":".")+
-      " Stations are auto-matched by name; correct any match below before applying. Your corrections are remembered for next time."
-    ]));
-
-    if(stns.length===0){
-      body.appendChild(el("div",{cls:"rw-err"},["No stations in your list yet for "+S.office+" / "+S.subtype+". Import some from the feed below, then run sync again."]));
-    }
-
-    /* per-station mapping table */
-    var rows=[];
-    var tbl=el("table",{cls:"rw-tbl"});
-    tbl.appendChild(el("thead",[el("tr",[
-      el("th",{style:"width:24px"},["✓"]),el("th",["Your Station"]),
-      el("th",["Match on River Watch"]),el("th",["Last Data"]),el("th",{style:"width:90px"},["Will Set"])
-    ])]));
-    var tb=el("tbody");
-    stns.forEach(function(stn){
-      var best=-1,bestSc=0;
-      var savedTitle=savedMap[stn.id];
-      if(savedTitle){
-        feed.forEach(function(f,fi){if(f.title===savedTitle)best=fi;});
-      }
-      if(best<0){
-        var n=rwNorm(stn.name);
-        feedNorm.forEach(function(fn,fi){var sc=rwScore(n,fn);if(sc>bestSc){bestSc=sc;best=fi;}});
-        if(bestSc<0.5)best=-1;
-      }
-      var inc=document.createElement("input");inc.type="checkbox";inc.checked=best>=0;
-      var sel=document.createElement("select");sel.className="rw-sel";
-      var opNone=document.createElement("option");opNone.value="-1";opNone.textContent="— not on River Watch —";
-      sel.appendChild(opNone);
-      feed.forEach(function(f,fi){
-        var op=document.createElement("option");op.value=String(fi);op.textContent=f.title;
-        if(fi===best)op.selected=true;sel.appendChild(op);
-      });
-      var lastTd=el("td",{cls:"rw-lastdata"});
-      var propTd=el("td");
-      var row={stn:stn,inc:inc,sel:sel,lastTd:lastTd,propTd:propTd};
-      rows.push(row);
-      sel.onchange=function(){inc.checked=parseInt(sel.value)>=0;refresh();};
-      inc.onchange=refresh;
-      tb.appendChild(el("tr",[
-        el("td",[inc]),
-        el("td",[el("b",[stn.no?stn.no+" ":""]) ,txt(stn.name)]),
-        el("td",[sel]),lastTd,propTd
-      ]));
-    });
-    tbl.appendChild(tb);
-    if(stns.length>0)body.appendChild(el("div",{style:"max-height:300px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px"},[tbl]));
-
-    function proposed(row){
-      var fi=parseInt(row.sel.value);
-      if(!row.inc.checked||fi<0)return null;
-      var h=rwHoursAgo(feed[fi].when);
-      return (h!=null&&h<=parseInt(thSel.value))?"A":"I";
-    }
-    function refresh(){
-      rows.forEach(function(row){
-        var fi=parseInt(row.sel.value);
-        row.lastTd.innerHTML="";
-        row.propTd.innerHTML="";
-        if(fi>=0){
-          var f=feed[fi],h=rwHoursAgo(f.when);
-          row.lastTd.appendChild(txt((f.value!=null?f.value+" m · ":"")+rwFmtAgo(h)));
-        }else row.lastTd.appendChild(el("span",{style:"color:#c4cdd6"},["—"]));
-        var p=proposed(row);
-        if(p)row.propTd.appendChild(el("span",{cls:"rw-prop "+p},[p==="A"?"A · Active":"I · Inactive"]));
-        else row.propTd.appendChild(el("span",{cls:"rw-prop skip"},["skip"]));
-      });
-    }
-    thSel.onchange=refresh;
-    refresh();
-
-    /* feed stations not matched to anything — importable */
-    var usedTitles={};
-    rows.forEach(function(r){var fi=parseInt(r.sel.value);if(fi>=0)usedTitles[feed[fi].title]=1;});
-    var unmatched=feed.filter(function(f){return !usedTitles[f.title];});
-    if(unmatched.length>0){
-      body.appendChild(el("div",{cls:"rw-sec-lbl"},["On River Watch but not in your station list ("+unmatched.length+") — import if needed"]));
-      var listDiv=el("div",{cls:"rw-newlist"});
-      unmatched.forEach(function(f){
-        (function(fs){
-          var impB=el("button",{cls:"btn-rw-imp",onclick:function(){
-            if(!AUTH.user){flash("You must be logged in.",true);return;}
-            var k2=SK(S.office,S.subtype);
-            var stn={id:"s"+Date.now()+Math.floor(Math.random()*1000),no:"",name:fs.title,elev:"",type:"Automatic",medium:"GSM"};
-            S.stns[k2]=(S.stns[k2]||[]).concat([stn]);lSet(k2,S.stns[k2]);
-            var mp=lGet(rwMapKey())||{};mp[stn.id]=fs.title;lSet(rwMapKey(),mp);
-            flash('Imported "'+fs.title+'" — reopen sync to include it');
-            this.disabled=true;this.textContent="✓ added";this.style.opacity=".5";
-          }},["＋ Add station"]);
-          listDiv.appendChild(el("div",{cls:"rw-new-row"},[
-            el("span",{style:"overflow:hidden;text-overflow:ellipsis;white-space:nowrap"},[fs.title+(fs.basin?"  ·  "+fs.basin:"")]),impB
-          ]));
-        })(f);
-      });
-      body.appendChild(listDiv);
-    }
-
-    /* apply button */
-    var applyB=document.createElement("button");
-    applyB.className="btn-lock-confirm";
-    applyB.textContent="✓ Apply Status for Day "+realDay+" ("+realMonth+")";
-    applyB.onclick=function(){
-      if(!AUTH.user){flash("You must be logged in.",true);return;}
-      if(S.year!==realYear){S.year=realYear;lSet("rls_year",realYear);S.status={};}
-      S.month=realMonth;
-      if(isMonthLocked(realMonth)){flash("🔒 "+realMonth+" "+realYear+" is locked. Ask admin to unlock first.",true);return;}
-      var k=TK(S.office,S.subtype,realMonth);
-      if(S.status[k]===undefined)S.status[k]=lGet(k)||{};
-      var mp=lGet(rwMapKey())||{};
-      var nA=0,nI=0,nSkip=0;
-      rows.forEach(function(row){
-        var fi=parseInt(row.sel.value);
-        mp[row.stn.id]=fi>=0?feed[fi].title:"";
-        var p=proposed(row);
-        if(!p){nSkip++;return;}
-        if(!S.status[k][row.stn.id])S.status[k][row.stn.id]={};
-        var existing=S.status[k][row.stn.id][realDay]||"";
-        if(existing&&!owChk.checked){nSkip++;return;}
-        S.status[k][row.stn.id][realDay]=p;
-        if(p==="A")nA++;else nI++;
-      });
-      lSet(k,S.status[k]);
-      lSet(rwMapKey(),mp);
-      overlay.remove();
-      flash("River Watch sync: "+nA+" Active, "+nI+" Inactive set for "+realMonth+" "+realDay+(nSkip?" · "+nSkip+" skipped":""));
-      render();
-    };
-    foot.insertBefore(applyB,closeB);
-  }
-}
-
-/* ════════════════════════════════════════
-   MODEM INVENTORY (Satellite / GSM)
-════════════════════════════════════════ */
-function invKey(){return "rls_inv_"+sk(S.office)+"_"+sk(S.subtype);}
-function getInvAll(){return lGet(invKey())||{};}
-function getInv(id){
-  var all=getInvAll();var d=all[id]||{};
-  if(!d.sat)d.sat={};if(!d.gsm)d.gsm={};
-  if(!d.satR)d.satR=[];if(!d.gsmR)d.gsmR=[];
-  return d;
-}
-function saveInv(id,d){var all=getInvAll();all[id]=d;lSet(invKey(),all);}
-function setInvField(id,side,field,val){
-  if(!AUTH.user){flash("You must be logged in to edit inventory.",true);return;}
-  var d=getInv(id);d[side][field]=val.trim();saveInv(id,d);
-}
-function saveRecharge(id,side){
-  if(!AUTH.user){flash("You must be logged in to add recharges.",true);return;}
-  var f=S.invForm||{};
-  if(!f.on&&!f.validity&&!f.volume&&!f.price&&!f.by){flash("Fill at least one recharge field",true);return;}
-  var d=getInv(id);
-  var arr=(side==="sat"?d.satR:d.gsmR);
-  arr.unshift({on:(f.on||"").trim(),validity:(f.validity||"").trim(),volume:(f.volume||"").trim(),
-    price:(f.price||"").trim(),by:(f.by||"").trim(),ts:Date.now()});
-  saveInv(id,d);
-  S.invAddFor=null;S.invForm={};
-  flash("Recharge entry saved");render();
-}
-function deleteRecharge(id,side,idx){
-  if(!AUTH.user){flash("You must be logged in.",true);return;}
-  if(!confirm("Delete this recharge entry?\n\nThis cannot be undone."))return;
-  var d=getInv(id);
-  (side==="sat"?d.satR:d.gsmR).splice(idx,1);
-  saveInv(id,d);flash("Recharge entry deleted");render();
-}
-function validityBadge(v){
-  if(!v)return el("span",{cls:"inv-badge badge-none"},["no recharge"]);
-  var dt=new Date(v);
-  if(isNaN(dt.getTime()))return el("span",{cls:"inv-badge badge-none"},[v]);
-  var days=Math.ceil((dt-new Date())/86400000);
-  if(days<0)return el("span",{cls:"inv-badge badge-exp",title:"Validity expired on "+v},["⛔ expired "+Math.abs(days)+"d"]);
-  if(days<=15)return el("span",{cls:"inv-badge badge-warn",title:"Validity ends "+v},["⚠ "+days+"d left"]);
-  return el("span",{cls:"inv-badge badge-ok",title:"Validity ends "+v},["✓ "+days+"d left"]);
-}
-function downloadInventoryCSV(){
-  var side=S.invSide,isSat=side==="sat";
-  var stns=S.stns[SK(S.office,S.subtype)]||[];
-  var hdr=["S.N.","Station No.","Station",isSat?"Modem Brand":"Modem Brand","Serial No.",
-    isSat?"FTI No.":"SIM No. (NTC / NCELL)","Recharge On","Validity","Data Volume","Price","Recharged By"];
-  var rows=[hdr];
-  stns.forEach(function(stn,i){
-    var d=getInv(stn.id),m=d[side],rc=isSat?d.satR:d.gsmR;
-    var base=[i+1,stn.no,stn.name,m.brand||"",m.serial||"",isSat?(m.fti||""):(m.sim||"")];
-    if(rc.length===0){rows.push(base.concat(["","","","",""]));}
-    else rc.forEach(function(r,j){
-      rows.push((j===0?base:["","","","","",""]).concat([r.on,r.validity,r.volume,r.price,r.by]));
-    });
-  });
-  var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
-  var a=document.createElement("a");
-  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
-  a.download=(isSat?"Satellite":"GSM")+"_Modem_Inventory_"+sk(S.office)+".csv";a.click();
-}
-
-function renderInventory(app){
-  var side=S.invSide,isSat=side==="sat";
-  var allStns=S.stns[SK(S.office,S.subtype)]||[];
-  var medWanted=isSat?"Satellite":"GSM";
-  var stns=S.invMatchOnly?allStns.filter(function(s){return s.medium===medWanted;}):allStns;
-  var wrap=el("div",{cls:"inv-wrap"});
-
-  /* toolbar */
-  var bar=el("div",{cls:"inv-bar"});
-  bar.appendChild(el("div",{cls:"inv-toggle"},[
-    el("button",{cls:"inv-tg sat"+(isSat?" active":""),onclick:function(){S.invSide="sat";S.invAddFor=null;S.invHistFor=null;render();}},["🛰 Satellite Modems"]),
-    el("button",{cls:"inv-tg gsm"+(!isSat?" active":""),onclick:function(){S.invSide="gsm";S.invAddFor=null;S.invHistFor=null;render();}},["📶 GSM Modems"])
-  ]));
-  var chk=el("input",{type:"checkbox"});chk.checked=S.invMatchOnly;
-  chk.onchange=function(){S.invMatchOnly=this.checked;render();};
-  bar.appendChild(el("label",{cls:"inv-filter"},[chk,txt("Only stations with medium = "+medWanted)]));
-  bar.appendChild(el("div",{cls:"inv-info"},[
-    txt((isSat?"Satellite":"GSM")+" modem & recharge register — "),el("b",[S.office]),txt(" / "),el("b",[S.subtype]),
-    txt(" · "+stns.length+" station"+(stns.length!==1?"s":""))
-  ]));
-  bar.appendChild(el("button",{cls:"btn-dl",onclick:downloadInventoryCSV},["⬇ Export CSV"]));
-  wrap.appendChild(bar);
-
-  if(stns.length===0){
-    wrap.appendChild(el("div",{cls:"inv-empty"},[
-      allStns.length===0
-        ?"No stations for "+S.office+" / "+S.subtype+". Open ⚙ Stations to add them first."
-        :"No stations with medium \""+medWanted+"\". Untick the filter to see all stations."
-    ]));
-    app.appendChild(wrap);return;
-  }
-
-  /* table */
-  var tbl=el("table",{cls:"inv"});
-  var gr=el("tr");
-  gr.appendChild(el("th",{colspan:"3"},[""]));
-  gr.appendChild(el("th",{cls:isSat?"grp-sat":"grp-gsm",colspan:"3"},[(isSat?"🛰 Satellite":"📶 GSM")+" Modem Information"]));
-  gr.appendChild(el("th",{cls:"grp-rc",colspan:"6"},[(isSat?"Satellite":"GSM")+" Recharge Info (latest)"]));
-  gr.appendChild(el("th",[""]));
-  var hr=el("tr");
-  [["#",""],["Stn No.",""],["Station / Name",""],["Brand",""],["Serial No.",""],
-   [isSat?"FTI No.":"SIM No. (NTC / NCELL)",""],
-   ["Recharged On",""],["Validity",""],["Status",""],["Data Volume",""],["Price",""],["Recharged By",""],["Actions",""]
-  ].forEach(function(h){hr.appendChild(el("th",[h[0]]));});
-  tbl.appendChild(el("thead",[gr,hr]));
-
-  var tbody=el("tbody");
-  stns.forEach(function(stn,i){
-    var d=getInv(stn.id),m=d[side];
-    var rc=isSat?d.satR:d.gsmR;
-    var last=rc[0]||null;
-    var tr=el("tr",{cls:"inv-main"});
-    tr.appendChild(el("td",{cls:"c",style:"color:#94a3b8"},[String(i+1)]));
-    tr.appendChild(el("td",{cls:"c",style:"font-family:monospace"},[stn.no]));
-    var nameTd=el("td",{style:"white-space:nowrap;max-width:210px;overflow:hidden;text-overflow:ellipsis",title:stn.name+" · medium: "+stn.medium},[stn.name]);
-    tr.appendChild(nameTd);
-
-    /* editable modem info */
-    [["brand","e.g. Hughes / Thuraya"],["serial","Serial number"],
-     [isSat?"fti":"sim",isSat?"FTI number":"NTC: 98… / NCELL: 98…"]].forEach(function(f){
-      (function(field,ph){
-        var inp=document.createElement("input");
-        inp.type="text";inp.className="inv-inp";inp.value=m[field]||"";inp.placeholder=ph;
-        inp.onchange=function(){setInvField(stn.id,side,field,this.value);};
-        tr.appendChild(el("td",[inp]));
-      })(f[0],f[1]);
-    });
-
-    /* latest recharge summary (read-only) */
-    tr.appendChild(el("td",{cls:"c inv-last"},[last&&last.on?last.on:el("span",{cls:"dim2"},["—"])]));
-    tr.appendChild(el("td",{cls:"c inv-last"},[last&&last.validity?last.validity:el("span",{cls:"dim2"},["—"])]));
-    tr.appendChild(el("td",{cls:"c"},[validityBadge(last?last.validity:"")]));
-    tr.appendChild(el("td",{cls:"c inv-last"},[last&&last.volume?last.volume:el("span",{cls:"dim2"},["—"])]));
-    tr.appendChild(el("td",{cls:"c inv-last"},[last&&last.price?last.price:el("span",{cls:"dim2"},["—"])]));
-    tr.appendChild(el("td",{cls:"c inv-last"},[last&&last.by?last.by:el("span",{cls:"dim2"},["—"])]));
-
-    /* actions */
-    var addOpen=S.invAddFor===stn.id,histOpen=S.invHistFor===stn.id;
-    tr.appendChild(el("td",{cls:"c",style:"white-space:nowrap"},[
-      el("button",{cls:"btn-rc-add",onclick:function(){
-        S.invAddFor=addOpen?null:stn.id;S.invHistFor=null;S.invForm={};render();
-      }},[addOpen?"✕ Cancel":"＋ Recharge"]),
-      txt(" "),
-      el("button",{cls:"btn-rc-hist"+(histOpen?" open":""),onclick:function(){
-        S.invHistFor=histOpen?null:stn.id;S.invAddFor=null;render();
-      },title:"Show recharge history"},["📜 "+rc.length])
-    ]));
-    tbody.appendChild(tr);
-
-    /* add-recharge inline form */
-    if(addOpen){
-      var ftr=el("tr",{cls:"rc-form-row"});
-      var ftd=el("td");ftd.setAttribute("colspan","13");
-      var mk=function(lbl,key,type,ph){
-        var inp=document.createElement("input");
-        inp.type=type;inp.placeholder=ph||"";
-        inp.value=S.invForm[key]||"";
-        inp.oninput=function(){S.invForm[key]=this.value;};
-        inp.onkeydown=function(e){if(e.key==="Enter")saveRecharge(stn.id,side);};
-        return el("div",{cls:"fld"},[el("label",[txt(lbl)]),inp]);
-      };
-      ftd.appendChild(el("div",{cls:"rc-form"},[
-        el("b",{style:"font-size:11px;color:#1d4ed8;margin-right:4px;align-self:center"},["New "+(isSat?"satellite":"GSM")+" recharge — "+stn.name+":"]),
-        mk("Recharged on","on","date"),
-        mk("Valid until","validity","date"),
-        mk("Data volume","volume","text","e.g. 5 GB / 90 days"),
-        mk("Price","price","text","e.g. NPR 4,500"),
-        mk("Recharged by","by","text","Name"),
-        el("button",{cls:"btn-save",onclick:function(){saveRecharge(stn.id,side);}},["✓ Save Entry"]),
-        el("button",{cls:"btn-cancel",onclick:function(){S.invAddFor=null;S.invForm={};render();}},["Cancel"])
-      ]));
-      ftr.appendChild(ftd);tbody.appendChild(ftr);
-    }
-
-    /* history */
-    if(histOpen){
-      var htr=el("tr",{cls:"rc-hist-row"});
-      var htd=el("td");htd.setAttribute("colspan","13");
-      htd.appendChild(el("div",{cls:"rc-hist-lbl"},["Recharge history — "+stn.name+" ("+rc.length+" entr"+(rc.length===1?"y":"ies")+", newest first)"]));
-      if(rc.length===0){
-        htd.appendChild(el("div",{style:"font-size:11px;color:#94a3b8;font-style:italic"},["No recharge entries yet. Use ＋ Recharge to add the first one."]));
-      }else{
-        var ht=el("table",{cls:"rc-hist"});
-        ht.appendChild(el("thead",[el("tr",[
-          el("th",["#"]),el("th",["Recharged On"]),el("th",["Validity"]),el("th",["Status"]),
-          el("th",["Data Volume"]),el("th",["Price"]),el("th",["Recharged By"]),el("th",[""])
-        ])]));
-        var hb=el("tbody");
-        rc.forEach(function(r,idx){
-          hb.appendChild(el("tr",[
-            el("td",{style:"color:#94a3b8"},[String(rc.length-idx)]),
-            el("td",[r.on||"—"]),el("td",[r.validity||"—"]),
-            el("td",[validityBadge(r.validity)]),
-            el("td",[r.volume||"—"]),el("td",[r.price||"—"]),el("td",[r.by||"—"]),
-            el("td",[el("button",{cls:"btn-rm",onclick:function(){deleteRecharge(stn.id,side,idx);}},["✕ delete"])])
-          ]));
-        });
-        ht.appendChild(hb);htd.appendChild(ht);
-      }
-      htr.appendChild(htd);tbody.appendChild(htr);
-    }
-  });
-  tbl.appendChild(tbody);
-  wrap.appendChild(el("div",{cls:"tbl-wrap"},[tbl]));
-  app.appendChild(wrap);
-}
-
-/* ════════════════════════════════════════
-   MAIN RENDER
-════════════════════════════════════════ */
 function render(){
-  if(!AUTH.loggedIn){renderLogin();return;}
-  document.body.style.padding="16px";
-  var appEl=document.getElementById("app");
-  appEl.style.cssText="";
-  initStns();loadStatus();
-
-  var visOff=getVisibleOffices();
-  if(visOff.indexOf(S.office)<0)S.office=visOff[0]||"DHM";
-
-  var stns=S.stns[SK(S.office,S.subtype)]||[];
-  var curK=TK(S.office,S.subtype,S.month);var curSt=S.status[curK]||{};
-  var days=dim(S.month);var locked=isMonthLocked();
-  var isAdmin=AUTH.user.role==="admin";
-
-  var app=document.getElementById("app");app.innerHTML="";
-
-  /* ── HEADER ── */
-  var headerChildren=[
-    el("div",{cls:"header-title",style:"cursor:pointer",title:"Go to Daily Status",onclick:function(){S.view="status";S.showManage=false;S.showUserMgmt=false;render();}},["🌊  DHM RLS Station Daily Status Register"]),
-    el("div",{cls:"header-row"},[
-      el("div",{cls:"ctrl"},[el("span",{cls:"ctrl-lbl"},["Year:"]),
-        mkSel(YEARS.map(String),String(S.year),"hdr-sel",function(){S.year=parseInt(this.value);S.status={};lSet("rls_year",S.year);render();})
-      ]),
-      el("div",{cls:"ctrl"},[el("span",{cls:"ctrl-lbl"},["Office:"]),
-        mkSel(visOff,S.office,"hdr-sel",function(){S.office=this.value;render();}),
-        isAdmin?el("button",{cls:"hdr-btn"+(S.showAddOff?" hdr-btn-active":""),onclick:function(){S.showAddOff=!S.showAddOff;S.showDelOff=false;render();}},["+ Add"]):null,
-        isAdmin?el("button",{cls:"hdr-btn hdr-btn-red"+(S.showDelOff?" hdr-btn-active":""),onclick:function(){S.showDelOff=!S.showDelOff;S.showAddOff=false;render();}},["🗑"]):null
-      ]),
-      el("div",{cls:"ctrl"},[el("span",{cls:"ctrl-lbl"},["Sub-type:"]),
-        (function(){
-          var visSub=getVisibleSubtypes();
-          if(visSub.indexOf(S.subtype)<0)S.subtype=visSub[0]||SUBTYPES[0];
-          var s=document.createElement("select");s.className="hdr-sel";
-          s.onchange=function(){S.subtype=this.value;render();};
-          SUBTYPE_GROUPS.forEach(function(grp){
-            var visOpts=grp.options.filter(function(o){return visSub.indexOf(o)>=0;});
-            if(visOpts.length===0)return;
-            if(visOpts.length===1){
-              var op=document.createElement("option");op.value=visOpts[0];op.textContent=visOpts[0];
-              if(visOpts[0]===S.subtype)op.selected=true;s.appendChild(op);
-            }else{
-              var og=document.createElement("optgroup");og.label=grp.label;
-              visOpts.forEach(function(o){
-                var op=document.createElement("option");op.value=o;op.textContent=o;
-                if(o===S.subtype)op.selected=true;og.appendChild(op);
-              });
-              s.appendChild(og);
-            }
-          });
-          return s;
-        })()
-      ]),
-      el("div",{cls:"ctrl"},[el("span",{cls:"ctrl-lbl"},["Month:"]),
-        mkSel(MONTHS,S.month,"hdr-sel",function(){S.month=this.value;render();})
-      ]),
-      S.view==="status"?(
-        locked
-          ?el("button",{cls:"hdr-btn hdr-btn-locked",onclick:isAdmin?unlockMonth:function(){flash("Only Admin can unlock",true);}},["🔒 "+(isAdmin?"Click to Unlock":"Locked")])
-          :el("button",{cls:"hdr-btn hdr-btn-lock",onclick:lockMonth},["🔒 Lock Month"])
-      ):null,
-      S.view==="status"?el("button",{cls:"hdr-btn",title:"Fetch live station status from DHM River Watch and auto-fill today's A/I",onclick:openRiverWatchSync},["🌐 River Watch Sync"]):null,
-      el("button",{cls:"manage-btn"+(S.showManage?" active":""),onclick:function(){S.showManage=!S.showManage;if(S.showManage)S.view="status";if(isAdmin)S.showUserMgmt=false;render();}},["⚙ Stations ("+stns.length+")"]),
-      isAdmin?el("button",{cls:"manage-btn"+(S.showUserMgmt?" active":""),onclick:function(){S.showUserMgmt=!S.showUserMgmt;S.showManage=false;render();}},["👥 Users"]):null,
-      el("div",{cls:"user-pill"},[
-        txt("👤 "+AUTH.user.username),
-        el("span",{style:"font-size:9px;opacity:.65;margin-left:2px"},[" · "+(AUTH.user.role==="admin"?"Admin":"Data Entry")]),
-        el("button",{cls:"logout-btn",style:"background:rgba(96,165,250,.2);color:#bfdbfe;border-color:rgba(96,165,250,.4)",onclick:changeOwnPassword},["🔑 Password"]),
-        el("button",{cls:"logout-btn",onclick:doLogout},["Sign Out"])
-      ])
-    ])
-  ];
-
-  // Quick links bar — official DHM resources
-  headerChildren.push(el("div",{cls:"quick-links"},[
-    el("span",{cls:"ql-lbl"},["🔗 Links:"]),
-    el("a",{cls:"ql",href:"https://www.dhm.gov.np/",target:"_blank",rel:"noopener"},["🌐 DHM"]),
-    el("a",{cls:"ql",href:"https://hydrology.gov.np/",target:"_blank",rel:"noopener"},["💧 Hydrology"]),
-    el("a",{cls:"ql",href:"https://www.dhm.gov.np/hydrology/river-watch",target:"_blank",rel:"noopener"},["🌊 River Watch"]),
-    el("a",{cls:"ql",href:"https://www.dhm.gov.np/hydrology/rainfall-watch",target:"_blank",rel:"noopener"},["🌧️ Rainfall Watch"]),
-    el("a",{cls:"ql",href:"https://dhm.gov.np/hydrology/floodMonitoring",target:"_blank",rel:"noopener"},["⚠️ Flood Monitoring"]),
-    el("a",{cls:"ql",href:"https://dhm.gov.np/hydrology/realtime-stream",target:"_blank",rel:"noopener"},["📈 Real-Time Stream Flow"]),
-    el("a",{cls:"ql",href:"https://daq.hydrology.gov.np/#/monitoring/map?_k=grsfe8",target:"_blank",rel:"noopener"},["🗺️ DAQ Monitoring Map"])
-  ]));
-
-  if(S.showAddOff&&isAdmin){
-    var offInp=el("input",{type:"text",placeholder:"New office name (e.g. OHM Surkhet)",value:S.newOff,
-      oninput:function(){S.newOff=this.value;},
-      onkeydown:function(e){if(e.key==="Enter")addOffice();}});
-    headerChildren.push(el("div",{cls:"sub-panel"},[
-      el("div",{cls:"sub-panel-row"},[offInp,el("button",{cls:"btn-add",onclick:addOffice},["Add"]),
-        el("button",{cls:"btn-x",onclick:function(){S.showAddOff=false;S.newOff="";render();}},["✕"])])
-    ]));
-    setTimeout(function(){offInp.focus();},10);
-  }
-  if(S.showDelOff&&isAdmin){
-    var delRows=S.offices.map(function(o){
-      var nEl=el("span",{cls:"del-row-name"+(o===S.office?" current":"")},[o+(o===S.office?" (current)":"")]);
-      var aEl;
-      if(o==="DHM")aEl=el("span",{cls:"protected-lbl"},["default — cannot delete"]);
-      else(function(nm){aEl=el("button",{cls:"btn-del-off",onclick:function(){deleteOffice(nm);}},["Delete"]);})(o);
-      return el("div",{cls:"del-row"},[nEl,aEl]);
-    });
-    headerChildren.push(el("div",{cls:"del-panel"},[el("div",{cls:"del-panel-info"},["Select office to delete. All its stations and data will be removed."])].concat(delRows)));
-  }
-  app.appendChild(el("div",{cls:"header"},headerChildren));
-
-  if(S.showUserMgmt&&isAdmin)renderUserPanel(app);
-
-  app.appendChild(el("div",{cls:"tabs"},[
-    el("button",{cls:"tab"+(S.view==="status"?" active":""),onclick:function(){S.view="status";render();}},["📋 Daily Status"]),
-    el("button",{cls:"tab"+(S.view==="summary"?" active":""),onclick:function(){S.view="summary";render();}},["📊 Annual Summary"]),
-    el("button",{cls:"tab"+(S.view==="inventory"?" active":""),onclick:function(){S.view="inventory";render();}},["📡 Modem Inventory"])
-  ]));
-
-  if(S.view==="inventory"){
-    renderInventory(app);
-    app.appendChild(el("div",{cls:"footer"},[
-      el("span",["Modem & recharge inventory · Changes auto-saved"]),
-      el("span",[S.office+" · "+S.subtype+" · "+(S.invSide==="sat"?"Satellite":"GSM")])
-    ]));
-    app.appendChild(el("div",{cls:"dev-footer"},["Developed by: Avishek Pokhrel, Hydrologist, DHM"]));
-    return;
+  initStns();
+  var visibleOffices = getVisibleOffices();
+  if(visibleOffices.indexOf(S.office) === -1 && visibleOffices.length > 0){
+    S.office = visibleOffices[0];
   }
 
-  if(S.view==="summary"){
-    renderSummary(app);
-    app.appendChild(el("div",{cls:"footer"},[
-      el("span",["Annual summary · Changes auto-saved"]),
-      el("span",[S.office+" · "+S.subtype+" · "+S.year])
-    ]));
-    app.appendChild(el("div",{cls:"dev-footer"},["Developed by: Avishek Pokhrel, Hydrologist, DHM"]));
-    return;
+  // Render Auth Header
+  var authEl = document.getElementById("auth-controls");
+  authEl.innerHTML = '<span>User: <strong>' + (AUTH.user ? AUTH.user.username : "Guest") + '</strong> (' + (AUTH.user ? AUTH.user.role : "None") + ')</span>';
+
+  // Render Nav Tabs
+  var tabEl = document.getElementById("tab-controls");
+  tabEl.innerHTML = `
+    <button class="nav-tab ${S.view === 'status' ? 'active' : ''}" onclick="S.view='status';render();">Status Register</button>
+    <button class="nav-tab ${S.view === 'manage' ? 'active' : ''}" onclick="S.view='manage';render();">Manage Stations</button>
+  `;
+
+  // Main Render
+  var mainEl = document.getElementById("main-content");
+  if(S.view === 'manage') {
+    var k = SK(S.office, S.subtype);
+    var list = S.stns[k] || [];
+    var rows = list.map(function(st, idx){
+      return `<tr>
+        <td>${st.no}</td>
+        <td>${st.name}</td>
+        <td>${st.elev}</td>
+        <td>${st.type}</td>
+        <td>${st.med}</td>
+      </tr>`;
+    }).join("");
+
+    mainEl.innerHTML = `
+      <div class="card">
+        <h3>Manage Stations - ${S.office} (${S.subtype})</h3>
+        <div style="margin: 15px 0;">
+          <label>Office Selection: </label>
+          <select onchange="S.office=this.value;render();">
+            ${visibleOffices.map(function(o){ return `<option value="${o}" ${o===S.office?'selected':''}>${o}</option>`; }).join("")}
+          </select>
+          <select onchange="S.subtype=this.value;render();" style="margin-left: 10px;">
+            ${SUBTYPES.map(function(s){ return `<option value="${s}" ${s===S.subtype?'selected':''}>${s}</option>`; }).join("")}
+          </select>
+        </div>
+        
+        <h4 style="margin-top:20px;">Add New Station</h4>
+        <div class="grid-form" style="margin-top:10px;">
+          <div class="form-group"><label>Stn No</label><input type="text" value="${S.newNo}" oninput="S.newNo=this.value"></div>
+          <div class="form-group"><label>Stn Name</label><input type="text" value="${S.newName}" oninput="S.newName=this.value"></div>
+          <div class="form-group"><label>Elevation</label><input type="text" value="${S.newElev}" oninput="S.newElev=this.value"></div>
+          <div class="form-group">
+            <label>Type</label>
+            <select onchange="S.newType=this.value">
+              <option value="Manual+Automatic">Manual+Automatic</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Medium</label>
+            <select onchange="S.newMed=this.value">
+              <option value="GSM">GSM</option>
+              <option value="Satellite">Satellite</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" onclick="addStation()">Add Station</button>
+
+        <table style="margin-top:25px;">
+          <thead>
+            <tr><th>No</th><th>Name</th><th>Elevation</th><th>Type</th><th>Medium</th></tr>
+          </thead>
+          <tbody>
+            ${rows || '<tr><td colspan="5">No stations configured for this category.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } else {
+    mainEl.innerHTML = `
+      <div class="card">
+        <div style="display:flex; gap: 15px; align-items:center;">
+          <div>
+            <label>Office: </label>
+            <select onchange="S.office=this.value;render();">
+              ${visibleOffices.map(function(o){ return `<option value="${o}" ${o===S.office?'selected':''}>${o}</option>`; }).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Type: </label>
+            <select onchange="S.subtype=this.value;render();">
+              ${SUBTYPES.map(function(s){ return `<option value="${s}" ${s===S.subtype?'selected':''}>${s}</option>`; }).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Month: </label>
+            <select onchange="S.month=this.value;render();">
+              ${MONTHS.map(function(m){ return `<option value="${m}" ${m===S.month?'selected':''}>${m}</option>`; }).join("")}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Daily Status Dashboard</h3>
+        <p style="color: var(--text-muted); font-size:0.9rem; margin-top:5px;">
+          Showing active record sheet for <strong>${S.office}</strong> - ${S.subtype} (${S.month} ${S.year})
+        </p>
+      </div>
+    `;
   }
-
-  /* ── MANAGE STATIONS PANEL ── */
-  if(S.showManage){
-    var noInp=el("input",{type:"text",placeholder:"e.g. 610",value:S.newNo,style:"width:72px",oninput:function(){S.newNo=this.value;}});
-    var nameInp=el("input",{type:"text",placeholder:"Station or river name",value:S.newName,
-      oninput:function(){S.newName=this.value;},onkeydown:function(e){if(e.key==="Enter")addStation();}});
-    var elevInp=el("input",{type:"number",placeholder:"e.g. 1340",value:S.newElev,style:"width:80px",oninput:function(){S.newElev=this.value;}});
-    var typeSel=mkSel(TYPES,S.newType,"",function(){S.newType=this.value;});
-    var medSel=mkSel(MEDIUMS,S.newMed,"",function(){S.newMed=this.value;});
-    var listEl;
-    if(stns.length===0){listEl=el("div",{cls:"empty-note"},["No stations yet."]);}
-    else{
-      var stbody=el("tbody");
-      stns.forEach(function(stn,i){
-        (function(s){
-          var tr=el("tr");
-          tr.setAttribute("data-stn-id",s.id);
-          tr.appendChild(el("td",{style:"text-align:center;color:#94a3b8;font-size:11px"},[String(i+1)]));
-          tr.appendChild(el("td",{style:"text-align:center;font-family:monospace;font-size:11px"},[s.no]));
-          tr.appendChild(el("td",[s.name]));
-          tr.appendChild(el("td",{style:"text-align:center;color:#64748b;font-size:11px"},[s.elev||""]));
-          tr.appendChild(el("td",{style:"text-align:center;color:#64748b;font-size:11px"},[s.type]));
-          tr.appendChild(el("td",{style:"text-align:center;color:#64748b;font-size:11px"},[s.medium]));
-          tr.appendChild(el("td",{style:"text-align:center"},[
-            el("div",{cls:"stn-actions"},[
-              el("button",{cls:"btn-edit",onclick:function(){editStation(s.id);},title:"Edit station"},["✏ edit"]),
-              el("button",{cls:"btn-rm",onclick:function(){deleteStation(s.id);}},["✕ remove"])
-            ])
-          ]));
-          stbody.appendChild(tr);
-        })(stn);
-      });
-      listEl=el("div",{cls:"stn-list"},[
-        el("table",[
-          el("thead",[el("tr",[
-            el("th",{style:"text-align:center"},["#"]),
-            el("th",{style:"text-align:center"},["No."]),
-            el("th",{style:"text-align:left"},[getNameLabel()]),
-            el("th",{style:"text-align:center"},["Elev (m)"]),
-            el("th",{style:"text-align:center"},["Type"]),
-            el("th",{style:"text-align:center"},["Medium"]),
-            el("th",["Actions"])
-          ])]),
-          stbody
-        ])
-      ]);
-    }
-    app.appendChild(el("div",{cls:"manage-panel"},[
-      el("div",{cls:"manage-title"},[txt("Stations for: "),el("span",{cls:"off"},[S.office]),txt(" / "),el("span",{cls:"sub"},[S.subtype])]),
-      el("div",{cls:"stn-form"},[
-        el("div",{cls:"fld"},[el("label",[txt("Station No.")]),noInp]),
-        el("div",{cls:"fld fld-grow"},[el("label",[txt(getNameLabel())]),nameInp]),
-        el("div",{cls:"fld"},[el("label",[txt("Elevation (m)")]),elevInp]),
-        el("div",{cls:"fld"},[el("label",[txt("Type")]),typeSel]),
-        el("div",{cls:"fld"},[el("label",[txt("Comm. Medium")]),medSel]),
-        el("button",{cls:"btn-stn-add",onclick:addStation},["+ Add & Save"])
-      ]),listEl
-    ]));
-    setTimeout(function(){noInp.focus();},10);
-  }
-
-  /* ── LEGEND ── */
-  var legItems=[{v:"A",l:"Active"},{v:"I",l:"Inactive"},{v:"F",l:"Flooded Away"},{v:"-",l:"Unchecked"}].map(function(p){
-    return el("span",{cls:"leg-item"},[el("span",{cls:"leg-code",style:"color:"+S_CLR[p.v]},[p.v]),el("span",{style:"color:#64748b"},[" = "+p.l])]);
-  });
-  legItems.push(el("span",{cls:"leg-hint"},["Click any day cell → select status from dropdown"]));
-  if(locked){
-    var lockTag=el("span",{cls:"lock-tag"},[txt("🔒 "+S.month+" Locked")]);
-    if(isAdmin){
-      var ulnk=el("span",{cls:"unlock-lnk",onclick:unlockMonth},["Unlock"]);
-      lockTag.appendChild(ulnk);
-    }
-    legItems.push(lockTag);
-  }
-  app.appendChild(el("div",{cls:"legend"},legItems));
-
-  /* ── STATUS TABLE ── */
-  var thead=el("thead");
-  var sRow=el("tr");
-  [["S.N.",""],["Stn No.",""],["Name / River","tleft"],["Elev (m)",""],["Station Type",""],["Medium",""]].forEach(function(h){
-    var label=h[0]==="Name / River"?getNameLabel():h[0];
-    sRow.appendChild(el("th",{cls:h[1]},[label]));
-  });
-  for(var d=1;d<=days;d++)sRow.appendChild(el("th",[String(d)]));
-  for(var d=days+1;d<=31;d++)sRow.appendChild(el("th",{cls:"dim"},[String(d)]));
-  sRow.appendChild(el("th",{cls:"dark"},["Active"]));
-  sRow.appendChild(el("th",{cls:"dark"},["Inactive"]));
-  sRow.appendChild(el("th",{cls:"dark",style:"min-width:110px"},["Remarks"]));
-  thead.appendChild(sRow);
-
-  var tbody=el("tbody");
-  if(stns.length===0){
-    var noTd=el("td",{cls:"no-stn"},["No stations for "+S.office+" / "+S.subtype+". Open ⚙ Manage Stations to add them."]);
-    noTd.setAttribute("colspan","40");
-    tbody.appendChild(el("tr",[noTd]));
-  }else{
-    stns.forEach(function(stn,i){
-      var stats=getStnStats(stn.id);
-      var stnSt=curSt[stn.id]||{};
-      var tr=el("tr");
-      tr.appendChild(el("td",{style:"text-align:center;color:#94a3b8;padding:3px 4px;border-right:1px solid #e2e8f0"},[String(i+1)]));
-      tr.appendChild(el("td",{style:"text-align:center;font-family:monospace;padding:3px 4px;border-right:1px solid #e2e8f0"},[stn.no]));
-      tr.appendChild(el("td",{style:"text-align:left;padding-left:8px;border-right:1px solid #e2e8f0;white-space:nowrap;min-width:240px",title:stn.name},[stn.name]));
-      tr.appendChild(el("td",{style:"text-align:center;font-size:10px;color:#64748b;padding:3px 4px;border-right:1px solid #e2e8f0"},[stn.elev||""]));
-      tr.appendChild(el("td",{style:"text-align:center;font-size:10px;color:#64748b;padding:3px 4px;border-right:1px solid #e2e8f0"},[stn.type]));
-      tr.appendChild(el("td",{style:"text-align:center;font-size:10px;padding:3px 4px;border-right:1px solid #e2e8f0"},[stn.medium]));
-      for(var d=1;d<=31;d++){
-        (function(day){
-          var v=stnSt[day]||"",active=day<=days;
-          var tdCls="day"+(active&&locked?" dlocked":"");
-          if(!active)tdCls="grayed";
-          var td=el("td",{cls:tdCls});
-          if(active){
-            if(v){td.style.background=S_BG[v];td.style.color=S_CLR[v];td.textContent=v;}
-            else{td.style.color="#dde3ea";}
-            td.title=S.month+" Day "+day+(v?" : "+(S_LBL[v]||v):"");
-            if(!locked)(function(id,dy,m){td.onclick=function(e){showStatusPopup(e,id,dy,m);};})(stn.id,day,S.month);
-          }
-          tr.appendChild(td);
-        })(d);
-      }
-      tr.appendChild(el("td",{cls:"active-days"},[stats.A?String(stats.A):""]));
-      tr.appendChild(el("td",{cls:"inactive-days"},[stats.I?String(stats.I):""]));
-      (function(sid){
-        var rmkTd=el("td",{cls:"remarks-cell"});
-        var rmkInp=document.createElement("input");
-        rmkInp.type="text";rmkInp.className="remarks-inp";
-        rmkInp.value=getRmk(sid);
-        rmkInp.placeholder="Add remark…";
-        rmkInp.title="Monthly remark for this station";
-        rmkInp.onchange=function(){setRmk(sid,this.value.trim());};
-        rmkInp.onblur=function(){setRmk(sid,this.value.trim());};
-        if(locked){rmkInp.disabled=true;rmkInp.style.cursor="not-allowed";}
-        rmkTd.appendChild(rmkInp);
-        tr.appendChild(rmkTd);
-      })(stn.id);
-      tbody.appendChild(tr);
-    });
-  }
-
-  var tfoot=el("tfoot");
-  if(stns.length>0){
-    var fRows=[["Active (A)","#15803d","A"],["Inactive (I)","#dc2626","I"],["Flooded Away (F)","#c2410c","F"],["Unchecked (-)","#6b7280","-"],["Total","#1a3558","total"]];
-    fRows.forEach(function(row,ri){
-      var label=row[0],color=row[1],key=row[2];
-      var tr=el("tr",{cls:ri===4?"total":""});
-      var lbl=el("td",{cls:"flbl",style:"color:"+color},[label]);lbl.setAttribute("colspan","6");tr.appendChild(lbl);
-      for(var d=1;d<=days;d++){
-        var t=getDayTotals(d);
-        var v=key==="total"?(t.A+t.I+t.F+t["-"]):(t[key]||0);
-        tr.appendChild(el("td",{style:"text-align:center;padding:3px 4px;border-right:1px solid #e2e8f0;font-size:11px;"+(v?"font-weight:bold;color:"+color:"color:#dde3ea")},[v?String(v):""]));
-      }
-      for(var d=days+1;d<=31;d++)tr.appendChild(el("td",{cls:"grayed"}));
-      var et=el("td");et.setAttribute("colspan","3");tr.appendChild(et);
-      tfoot.appendChild(tr);
-    });
-  }
-
-  var tbl=el("table",{cls:"status"});
-  tbl.style.minWidth=(565+days*26+110)+"px";
-  var cg=el("colgroup");
-  [32,58,240,60,120,55].forEach(function(w){var c=el("col");c.style.width=w+"px";cg.appendChild(c);});
-  for(var ci=0;ci<31;ci++){var c=el("col");c.style.width="26px";cg.appendChild(c);}
-  [46,46,110].forEach(function(w){var c=el("col");c.style.width=w+"px";cg.appendChild(c);});
-  tbl.appendChild(cg);tbl.appendChild(thead);tbl.appendChild(tbody);tbl.appendChild(tfoot);
-  app.appendChild(el("div",{cls:"tbl-wrap"},[tbl]));
-
-  app.appendChild(el("div",{cls:"footer"},[
-    el("span",["Changes auto-saved to browser storage"+(locked?" · 🔒 Month Locked":"")]),
-    el("span",[S.office+" · "+S.subtype+" · "+S.month+" "+S.year+" · "+stns.length+" station"+(stns.length!==1?"s":"")])
-  ]));
-  app.appendChild(el("div",{cls:"dev-footer"},["Developed by: Avishek Pokhrel, Hydrologist, DHM"]));
 }
 
-/* ── INIT ── */
-window._appRender=render;
-newCaptcha();
-if(checkSession()){
-  if(typeof gsLoad!=="undefined"){
-    gsLoad(function(){render();if(typeof startAutoRefresh!=="undefined")startAutoRefresh();});
-  }else{render();}
-}else{
-  renderLogin();
-}
+// Initial Kickoff
+render();
 </script>
 </body>
 </html>
