@@ -620,18 +620,34 @@ var TYPES=["Manual+Automatic","Manual","Automatic"];
 var MEDIUMS=["GSM","Satellite","N/A"];
 
 /* ── OFFICES ── */
-var DEFAULT_OFFICES=["CHWRR DHARAN","CHWRR POKHARA","CHWRR KOHALPUR","CHWRR ATTARIYA"];
-var DEFAULT_OFFICE=DEFAULT_OFFICES[0];
+var DEFAULT_OFFICES=["CHWRR BABARMAHAL","CHWRR DHARAN","CHWRR POKHARA","CHWRR KOHALPUR","CHWRR ATTARIYA"];
+var DEFAULT_OFFICE=DEFAULT_OFFICES[0];          // head office — protected, cannot be deleted
 /* Field offices that were retired — never shown, never re-addable. */
 var RETIRED_OFFICES=["OHM SURKHET","OHM JANAKPUR","NBFO","KBFO"];
-/* Old name -> new name, applied to saved data on every load. */
+/* Old office name -> new office name. Keys are compared case-insensitively.
+   DHM was the head-office record (Bagmati hydrological + all snow stations),
+   so it becomes CHWRR BABARMAHAL. OHM Dharan is its own office. */
 var OFFICE_RENAMES={
-  "DHM":"CHWRR DHARAN",
+  "DHM":"CHWRR BABARMAHAL",
+  "CHWRR":"CHWRR BABARMAHAL",
   "OHM DHARAN":"CHWRR DHARAN",
   "OHM POKHARA":"CHWRR POKHARA",
   "OHM KOHALPUR":"CHWRR KOHALPUR",
   "OHM ATTARIYA":"CHWRR ATTARIYA"
 };
+/* Literal legacy office names as they were actually stored, used to find and
+   move old data keys even after the office list itself has been rewritten. */
+var LEGACY_OFFICES=[
+  {old:"DHM",              nw:"CHWRR BABARMAHAL"},
+  {old:"OHM Dharan",       nw:"CHWRR DHARAN"},
+  {old:"OHM DHARAN",       nw:"CHWRR DHARAN"},
+  {old:"OHM Pokhara",      nw:"CHWRR POKHARA"},
+  {old:"OHM POKHARA",      nw:"CHWRR POKHARA"},
+  {old:"OHM Kohalpur",     nw:"CHWRR KOHALPUR"},
+  {old:"OHM KOHALPUR",     nw:"CHWRR KOHALPUR"},
+  {old:"OHM Attariya",     nw:"CHWRR ATTARIYA"},
+  {old:"OHM ATTARIYA",     nw:"CHWRR ATTARIYA"}
+];
 function isRetiredOffice(n){return RETIRED_OFFICES.indexOf(String(n).trim().toUpperCase())>=0;}
 function renameOffice(n){
   var k=String(n).trim().toUpperCase();
@@ -727,17 +743,104 @@ function isMonthLocked(month){
   return lGet(LK(S.office,S.subtype,S.year,month||S.month))===true;
 }
 
-/* ── OFFICE MIGRATION ──
-   Idempotent. Runs on boot and again after every remote pull, so an old
+/* ── OFFICE MIGRATION (v3) ──
+   Idempotent. Runs on boot and again after every remote pull, so a stale
    office list coming back from the server is cleaned up rather than shown.
-   Station/status data for renamed offices is copied to the new key; the old
-   key is left in place untouched so nothing is ever lost. Data for the four
-   retired field offices is dropped, as requested. */
+
+   The heavy data pass walks localStorage for keys belonging to the legacy
+   office names and copies them onto the new office's keys. Legacy keys are
+   never deleted, so an incorrect run can always be redone from source.
+
+   v3 fixes a v2 mistake: v2 folded the old DHM head-office record (Bagmati
+   hydrological stations plus the three snow-station lists) into CHWRR DHARAN
+   and skipped the real OHM Dharan data. v3 re-derives both offices from the
+   untouched legacy keys, and only overwrites a target whose contents are
+   still exactly what v2 wrote there. */
+
+var MIG_FLAG="rls_office_migration_v3";
+
+function migSameJSON(a,b){
+  try{return JSON.stringify(a)===JSON.stringify(b);}catch(e){return false;}
+}
+
+/* Copy one legacy office's stations/status/locks onto its new office name.
+   force=true overwrites a target that still holds the v2 value. */
+function migMoveOffice(from,to){
+  var wrongSrc=lGet(SK("DHM",SUBTYPES[0]))?"DHM":null;   // what v2 may have copied
+  var moved=false;
+  SUBTYPES.forEach(function(sub){
+    var oldS=SK(from,sub), newS=SK(to,sub);
+    var oldV=lGet(oldS);
+    if(!oldV||!oldV.length)return;
+    var curV=lGet(newS);
+    var targetIsFree=!curV||!curV.length;
+    var targetIsV2Artifact=wrongSrc&&migSameJSON(curV,lGet(SK(wrongSrc,sub)))&&from!==wrongSrc;
+    if(targetIsFree||targetIsV2Artifact){lSet(newS,oldV);moved=true;}
+  });
+  YEARS.forEach(function(y){
+    MONTHS.forEach(function(m){
+      SUBTYPES.forEach(function(sub){
+        var ot="rls_st_"+sk(from)+"_"+sk(sub)+"_"+y+"_"+sk(m);
+        var ov=lGet(ot);
+        if(ov){
+          var nt="rls_st_"+sk(to)+"_"+sk(sub)+"_"+y+"_"+sk(m);
+          var cur=lGet(nt);
+          var v2art=wrongSrc&&from!==wrongSrc&&migSameJSON(cur,lGet("rls_st_"+sk(wrongSrc)+"_"+sk(sub)+"_"+y+"_"+sk(m)));
+          if(!cur||v2art){lSet(nt,ov);moved=true;}
+        }
+        var ol="rls_lock_"+sk(from)+"_"+sk(sub)+"_"+y+"_"+sk(m);
+        if(lGet(ol)===true){
+          var nl="rls_lock_"+sk(to)+"_"+sk(sub)+"_"+y+"_"+sk(m);
+          if(lGet(nl)!==true)lSet(nl,true);
+        }
+      });
+    });
+  });
+  return moved;
+}
+
+/* v2 copied the DHM head-office record onto CHWRR DHARAN. Remove anything
+   there that is still byte-identical to the DHM source, so the real Dharan
+   data can take its place. Anything the user has since edited won't match
+   and is left alone. */
+function migScrubV2Artifacts(){
+  if(lGet("rls_office_migration_v2")!==true)return false;
+  var victim="CHWRR DHARAN", src="DHM", wiped=false;
+  SUBTYPES.forEach(function(sub){
+    var cur=lGet(SK(victim,sub)), bad=lGet(SK(src,sub));
+    if(cur&&cur.length&&bad&&bad.length&&migSameJSON(cur,bad)){lDel(SK(victim,sub));wiped=true;}
+    YEARS.forEach(function(y){
+      MONTHS.forEach(function(m){
+        var ct="rls_st_"+sk(victim)+"_"+sk(sub)+"_"+y+"_"+sk(m);
+        var bt="rls_st_"+sk(src)+"_"+sk(sub)+"_"+y+"_"+sk(m);
+        var cv=lGet(ct), bv=lGet(bt);
+        if(cv&&bv&&migSameJSON(cv,bv)){lDel(ct);wiped=true;}
+        var cl="rls_lock_"+sk(victim)+"_"+sk(sub)+"_"+y+"_"+sk(m);
+        var bl="rls_lock_"+sk(src)+"_"+sk(sub)+"_"+y+"_"+sk(m);
+        if(lGet(cl)===true&&lGet(bl)===true)lDel(cl);
+      });
+    });
+  });
+  return wiped;
+}
+
+function migPurgeOffice(name){
+  SUBTYPES.forEach(function(sub){
+    lDel(SK(name,sub));
+    if(typeof S!=="undefined"&&S.stns)delete S.stns[SK(name,sub)];
+    YEARS.forEach(function(y){
+      MONTHS.forEach(function(m){
+        lDel("rls_st_"+sk(name)+"_"+sk(sub)+"_"+y+"_"+sk(m));
+        lDel("rls_lock_"+sk(name)+"_"+sk(sub)+"_"+y+"_"+sk(m));
+      });
+    });
+  });
+}
+
 function migrateOffices(){
   var changed=false;
 
-  // -- a. office list --
-  var moves=[];              // [originalSavedName, newName] pairs
+  /* -- a. office list: rename, drop retired, ensure the five defaults -- */
   var list=lGet("rls_offices");
   if(!list||!list.length){
     list=DEFAULT_OFFICES.slice();
@@ -747,63 +850,33 @@ function migrateOffices(){
     list.forEach(function(o){
       if(isRetiredOffice(o)){changed=true;return;}
       var nn=renameOffice(o);
-      if(nn!==o){changed=true;moves.push([o,nn]);}
+      if(nn!==o)changed=true;
       if(out.indexOf(nn)<0)out.push(nn);else changed=true;
     });
     DEFAULT_OFFICES.forEach(function(d){if(out.indexOf(d)<0){out.push(d);changed=true;}});
-    // keep the four defaults first, in order
     var head=DEFAULT_OFFICES.filter(function(d){return out.indexOf(d)>=0;});
     var tail=out.filter(function(o){return DEFAULT_OFFICES.indexOf(o)<0;});
     list=head.concat(tail);
   }
 
-  // -- b/c. heavy one-time data pass (key renames + purge) --
-  var MIG_FLAG="rls_office_migration_v2";
+  /* -- b. one-time heavy data pass: legacy keys -> new office keys --
+     Dharan/Pokhara/Kohalpur/Attariya are moved BEFORE DHM so a real field
+     office always wins over the old head-office record. */
   if(lGet(MIG_FLAG)!==true){
-  var seen={};
-  moves.forEach(function(mv){
-    var from=mv[0], to=mv[1];
-    if(seen[to])return;
-    var moved=false;
-    SUBTYPES.forEach(function(sub){
-      var oldS=SK(from,sub), newS=SK(to,sub);
-      var oldV=lGet(oldS);
-      if(oldV&&oldV.length&&!(lGet(newS)||[]).length){lSet(newS,oldV);moved=true;}
-      YEARS.forEach(function(y){
-        MONTHS.forEach(function(m){
-          var ot="rls_st_"+sk(from)+"_"+sk(sub)+"_"+y+"_"+sk(m);
-          var nt="rls_st_"+sk(to)+"_"+sk(sub)+"_"+y+"_"+sk(m);
-          var ov=lGet(ot);
-          if(ov&&!lGet(nt)){lSet(nt,ov);moved=true;}
-          var ol="rls_lock_"+sk(from)+"_"+sk(sub)+"_"+y+"_"+sk(m);
-          var nl="rls_lock_"+sk(to)+"_"+sk(sub)+"_"+y+"_"+sk(m);
-          if(lGet(ol)===true&&lGet(nl)!==true)lSet(nl,true);
-        });
-      });
+    if(migScrubV2Artifacts())changed=true;
+    var ordered=LEGACY_OFFICES.filter(function(m){return m.old!=="DHM";})
+                              .concat(LEGACY_OFFICES.filter(function(m){return m.old==="DHM";}));
+    ordered.forEach(function(m){
+      if(migMoveOffice(m.old,m.nw))changed=true;
     });
-    if(moved){seen[to]=true;changed=true;}
-  });
-
-  // -- c. purge retired field offices --
-  RETIRED_OFFICES.forEach(function(r){
-    SUBTYPES.forEach(function(sub){
-      lDel(SK(r,sub));delete S.stns[SK(r,sub)];
-      YEARS.forEach(function(y){
-        MONTHS.forEach(function(m){
-          lDel("rls_st_"+sk(r)+"_"+sk(sub)+"_"+y+"_"+sk(m));
-          lDel("rls_lock_"+sk(r)+"_"+sk(sub)+"_"+y+"_"+sk(m));
-        });
-      });
-    });
-  });
-
-  lSet(MIG_FLAG,true);
+    RETIRED_OFFICES.forEach(migPurgeOffice);
+    lSet(MIG_FLAG,true);
   }
 
   if(changed)lSet("rls_offices",list);
-  S.offices=list;
+  if(typeof S!=="undefined")S.offices=list;
 
-  // -- d. user account office assignments --
+  /* -- c. user account office assignments -- */
   var users=lGet("rls_users");
   if(users&&users.length){
     var uChanged=false;
@@ -819,20 +892,21 @@ function migrateOffices(){
       u.offices=no;
     });
     if(uChanged)lSet("rls_users",users);
-    if(AUTH.user&&AUTH.user.offices&&AUTH.user.offices.length){
-      var mine=[];
-      AUTH.user.offices.forEach(function(o){
-        if(isRetiredOffice(o))return;
-        var nn=renameOffice(o);
-        if(mine.indexOf(nn)<0)mine.push(nn);
-      });
-      AUTH.user.offices=mine;
-    }
+  }
+  if(AUTH.user&&AUTH.user.offices&&AUTH.user.offices.length){
+    var mine=[];
+    AUTH.user.offices.forEach(function(o){
+      if(isRetiredOffice(o))return;
+      var nn=renameOffice(o);
+      if(mine.indexOf(nn)<0)mine.push(nn);
+    });
+    AUTH.user.offices=mine;
   }
 
-  if(S.office&&(isRetiredOffice(S.office)||renameOffice(S.office)!==S.office))
-    S.office=renameOffice(S.office);
-  if(list.indexOf(S.office)<0)S.office=list[0]||DEFAULT_OFFICE;
+  if(typeof S!=="undefined"){
+    if(S.office)S.office=renameOffice(S.office);
+    if(list.indexOf(S.office)<0)S.office=list[0]||DEFAULT_OFFICE;
+  }
   return list;
 }
 
