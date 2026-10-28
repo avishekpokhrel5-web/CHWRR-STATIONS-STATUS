@@ -498,6 +498,7 @@ table.rw-tbl tbody tr:nth-child(even) td{background:#f8fafc}
 }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.4.0/socket.io.js"></script>
 <script>
 var SB_URL = "https://hxeiiaokpspkaalzpvrs.supabase.co";
 var SB_KEY = "sb_publishable_QfrQsAKebuxrBRBRJKq9ow_EcEHxTXn";
@@ -2001,7 +2002,75 @@ var RW_API="https://bipadportal.gov.np/api/v1/river/?format=json&limit=-1";
 
 function rwMapKey(){return "rls_rwmap_"+sk(S.office)+"_"+sk(S.subtype);}
 
+/* ── Live station feed ──
+   1st choice: CHWRR hydrology.gov.np (socket.io, public, CORS open)
+   Fallback:   BIPAD river API (old method)                          */
+var HY_EVENTS={};          // event name -> array of stations
+var HY_LAST=0;             // time we last received data
+var _hySock=null;
+
+function hyConnect(){
+  if(_hySock||typeof io==="undefined")return;
+  try{
+    _hySock=io("https://hydrology.gov.np",{path:"/gss/socket.io",transports:["polling","websocket"],reconnection:true});
+    var _oe=_hySock.onevent;
+    _hySock.onevent=function(pkt){        // catch every event the server sends
+      try{
+        var a=pkt.data||[];
+        if(typeof a[0]==="string"&&Array.isArray(a[1])&&a[1].length&&typeof a[1][0]==="object"){
+          HY_EVENTS[a[0]]=a[1];HY_LAST=Date.now();
+          console.log("[hydrology.gov.np] "+a[0]+": "+a[1].length+" stations");
+        }
+      }catch(e){}
+      _oe.call(this,pkt);
+    };
+  }catch(e){console.warn("hydrology socket failed",e);}
+}
+
+function hyTime(x){
+  var o=x.latest_observation||x.latestObservation||x.waterLevel||x.water_level||x.observation||{};
+  return o.datetime||o.dateTime||o.date||x.datetime||x.last_updated||x.modified_on||null;
+}
+function hyValue(x){
+  var o=x.latest_observation||x.latestObservation||x.waterLevel||x.water_level||{};
+  return (o.value!=null)?o.value:null;
+}
+
+function hyFeed(){
+  var isRiverSub=/hydro|flood/i.test(S.subtype||"");
+  var byTitle={},anyRiver=false;
+  Object.keys(HY_EVENTS).forEach(function(ev){if(!/rain/i.test(ev))anyRiver=true;});
+  Object.keys(HY_EVENTS).forEach(function(ev){
+    var rain=/rain/i.test(ev);
+    if(isRiverSub&&anyRiver&&rain)return;      // river subtypes: use river data only
+    HY_EVENTS[ev].forEach(function(x){
+      var t=String(x.name||x.title||"").trim();if(!t)return;
+      var title=(rain&&!/rain/i.test(t))?t+" (rainfall)":t;
+      var item={id:x.id,title:title,basin:x.basin||x.folder_name||"",status:x.status||"",value:hyValue(x),when:hyTime(x)};
+      var old=byTitle[title];
+      if(!old||(!old.when&&item.when))byTitle[title]=item;   // prefer entries that have a time
+    });
+  });
+  return Object.keys(byTitle).sort().map(function(k){return byTitle[k];});
+}
+
 function rwFetch(cb){
+  hyConnect();
+  var waited=0;
+  (function wait(){
+    var f=hyFeed();
+    // give the server a few seconds to send all its lists
+    if(f.length>=10&&Date.now()-HY_LAST>3000){cb(f,null);return;}
+    if(waited>=15000||typeof io==="undefined"){
+      if(f.length>=10)cb(f,null);else bipadFetch(cb);   // fallback to BIPAD
+      return;
+    }
+    waited+=500;setTimeout(wait,500);
+  })();
+}
+
+function bipadFetch(cb){
+
   // Try direct first; if browser CORS blocks it, fall back to public CORS proxies.
   var tries=[
     RW_API,
@@ -2766,6 +2835,48 @@ function render(){
 }
 
 /* ── INIT ── */
+
+/* ── AUTOMATIC daily status from live feed ──
+   Fills TODAY's cell for the current office/station type.
+   Uses only stations matched in River Watch Sync (saved matches).
+   Never touches a cell you set by hand: it only updates cells it set itself
+   and that still hold the value it set.                                     */
+var AUTO_HOURS=24;   // reported within this many hours = Active
+function autoKey(k){return k.replace(/^rls_st_/,"rls_autost_");}
+function runAutoStatus(){
+  if(!AUTH||!AUTH.user||!S.office||!S.subtype)return;
+  var now=new Date(),realMonth=MONTHS[now.getMonth()],realYear=now.getFullYear(),realDay=now.getDate();
+  if(S.year!==realYear||isMonthLocked(realMonth))return;
+  var feed=hyFeed();if(feed.length===0)return;
+  if(!feed.some(function(f){return f.when;}))return;   // safety: no times in feed -> do nothing
+  var byTitle={};feed.forEach(function(f){byTitle[f.title]=f;});
+  var mp=lGet(rwMapKey())||{};
+  var stns=S.stns[SK(S.office,S.subtype)]||[];
+  var k=TK(S.office,S.subtype,realMonth);
+  var st=S.status[k]!==undefined?S.status[k]:(lGet(k)||{});
+  var auto=lGet(autoKey(k))||{};
+  var changed=0;
+  stns.forEach(function(stn){
+    var f=byTitle[mp[stn.id]];if(!f)return;
+    var h=rwHoursAgo(f.when);
+    var v=(h!=null&&h<=AUTO_HOURS)?"A":"I";
+    if(!st[stn.id])st[stn.id]={};
+    var cur=st[stn.id][realDay]||"";
+    var myPrev=(auto[stn.id]||{})[realDay];
+    var mine=cur===""||(myPrev&&cur===myPrev);     // empty, or still our own value
+    if(!mine||cur===v)return;
+    st[stn.id][realDay]=v;
+    if(!auto[stn.id])auto[stn.id]={};
+    auto[stn.id][realDay]=v;changed++;
+  });
+  if(changed){
+    S.status[k]=st;lSet(k,st);lSet(autoKey(k),auto);
+    if(S.month===realMonth)render();
+    console.log("[auto status] updated "+changed+" station(s) for "+realMonth+" "+realDay);
+  }
+}
+setTimeout(function(){hyConnect();setTimeout(runAutoStatus,8000);},1000);
+setInterval(runAutoStatus,10*60*1000);   // re-check every 10 minutes
 window._appRender=render;
 newCaptcha();
 migrateOffices();
