@@ -2030,11 +2030,12 @@ function hyConnect(){
     _hySock.onevent=function(pkt){        // catch every event the server sends
       try{
         var a=pkt.data||[];
-        console.log("[hydrology.gov.np] event:",a[0],Array.isArray(a[1])?a[1].length+" items":"");
-        if(typeof a[0]==="string"&&Array.isArray(a[1])&&a[1].length&&typeof a[1][0]==="object"){
-          HY_EVENTS[a[0]]=a[1];HY_LAST=Date.now();
+        var list=hyToList(a[1]);
+        console.log("[hydrology.gov.np] event:",a[0],list?list.length+" items":"(format: "+(typeof a[1])+")",list?"":a[1]);
+        if(typeof a[0]==="string"&&list&&list.length){
+          HY_EVENTS[a[0]]=list;HY_LAST=Date.now();
         }
-      }catch(e){}
+      }catch(e){console.warn("[hydrology.gov.np] parse error",e);}
       _oe.call(this,pkt);
     };
   }catch(e){HY_STATE="failed: "+e.message;console.warn("hydrology socket failed",e);}
@@ -2047,6 +2048,23 @@ function hyRequest(){
   HY_LISTS.forEach(function(n){_hySock.emit("client_request",n);});
 }
 setInterval(hyRequest,5*60*1000);   // refresh lists every 5 minutes
+
+/* turn whatever the server sends into an array of station objects */
+function hyToList(d){
+  if(d==null)return null;
+  if(typeof d==="string"){try{d=JSON.parse(d);}catch(e){return null;}}
+  if(Array.isArray(d))return (d.length&&typeof d[0]==="object")?d:null;
+  if(typeof d==="object"){
+    var keys=["results","data","stations","features","items","list"];
+    for(var i=0;i<keys.length;i++){var r=hyToList(d[keys[i]]);if(r)return r;}
+    var vals=Object.keys(d).map(function(k){return d[k];});
+    if(vals.length&&vals.every(function(v){return v&&typeof v==="object"&&!Array.isArray(v);}))
+      return vals.map(function(v){return v.properties?Object.assign({},v.properties,v):v;});
+    var flat=[];vals.forEach(function(v){if(Array.isArray(v))v.forEach(function(x){if(x&&typeof x==="object")flat.push(x);});});
+    if(flat.length)return flat;
+  }
+  return null;
+}
 
 function hyTime(x){
   var o=x.latest_observation||x.latestObservation||x.waterLevel||x.water_level||x.observation||{};
@@ -2062,6 +2080,7 @@ function hyFeed(){
   Object.keys(HY_EVENTS).forEach(function(ev){
     var rain=/rain/i.test(ev);
     HY_EVENTS[ev].forEach(function(x){
+      if(x.properties&&!x.name)x=Object.assign({},x.properties,x);
       var t=String(x.name||x.title||"").trim();if(!t)return;
       var title=(rain&&!/rain/i.test(t))?t+" (rainfall)":t;
       var item={id:x.id,title:title,basin:x.basin||x.folder_name||"",status:x.status||"",value:hyValue(x),when:hyTime(x)};
