@@ -475,6 +475,10 @@ table.rw-tbl tbody tr:nth-child(even) td{background:#f8fafc}
 .rw-prop.A{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
 .rw-prop.I{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5}
 .rw-prop.skip{background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;font-weight:normal;font-style:italic}
+.rw-conf{font-size:10px;margin-top:3px;font-weight:600}
+.rw-conf.sure{color:#15803d}.rw-conf.likely{color:#0369a1}
+.rw-conf.maybe{color:#b45309}.rw-conf.weak{color:#94a3b8;font-weight:normal;font-style:italic}
+.rw-conf.none{color:#c4cdd6;font-weight:normal}
 .rw-lastdata{font-size:10px;color:#64748b;white-space:nowrap}
 .rw-sec-lbl{font-size:10px;font-weight:bold;color:#475569;text-transform:uppercase;
   letter-spacing:.05em;margin:14px 0 6px}
@@ -621,7 +625,7 @@ var TYPES=["Manual+Automatic","Manual","Automatic"];
 var MEDIUMS=["GSM","Satellite","N/A"];
 
 /* ── OFFICES ── */
-var DEFAULT_OFFICES=["CHWRR BABARMAHAL","CHWRR DHARAN","CHWRR POKHARA","CHWRR KOHALPUR","CHWRR ATTARIYA"];
+var DEFAULT_OFFICES=["CHWRR BABARMAHAL","CHWRR DHARAN","CHWRR POKHARA","CHWRR KOHALPUR","CHWRR ATTARIYA","UPPER KARNALI PROJECT","SUNKOSHI KAMALA PROJECT"];
 var DEFAULT_OFFICE=DEFAULT_OFFICES[0];          // head office — protected, cannot be deleted
 /* Field offices that were retired — never shown, never re-addable. */
 var RETIRED_OFFICES=["OHM SURKHET","OHM JANAKPUR","NBFO","KBFO"];
@@ -841,7 +845,7 @@ function migPurgeOffice(name){
 function migrateOffices(){
   var changed=false;
 
-  /* -- a. office list: rename, drop retired, ensure the five defaults -- */
+  /* -- a. office list: rename, drop retired, ensure all default offices -- */
   var list=lGet("rls_offices");
   if(!list||!list.length){
     list=DEFAULT_OFFICES.slice();
@@ -2087,7 +2091,7 @@ function hyFeed(){
       if(x.properties&&!x.name)x=Object.assign({},x.properties,x);
       var t=String(x.name||x.title||"").trim();if(!t)return;
       var title=(rain&&!/rain/i.test(t))?t+" (rainfall)":t;
-      var item={id:x.id,title:title,basin:x.basin||x.folder_name||"",status:x.status||"",value:hyValue(x),when:hyTime(x)};
+      var item={id:x.id,title:title,idx:String(x.stationIndex||(x.meta_data&&x.meta_data["Station Index"])||"").trim(),basin:x.basin||x.folder_name||"",status:x.status||"",value:hyValue(x),when:hyTime(x)};
       var old=byTitle[title];
       if(!old||(!old.when&&item.when))byTitle[title]=item;   // prefer entries that have a time
     });
@@ -2118,15 +2122,120 @@ function rwNorm(s){
     .replace(/\b(river|khola|nadi|nala|nadee|at|the|hs|rls|aws|station|bridge|gad|gaon|gau)\b/g," ")
     .replace(/\s+/g," ").trim();
 }
-function rwScore(a,b){
+function rwLev(a,b){            // edit distance (for spelling mistakes)
+  if(a===b)return 0;var m=a.length,n=b.length,d=[],i,j;
+  for(i=0;i<=m;i++){d[i]=[i];}for(j=0;j<=n;j++)d[0][j]=j;
+  for(i=1;i<=m;i++)for(j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return d[m][n];
+}
+function rwTokEq(x,y){
+  if(x===y)return true;
+  if(x.length<4||y.length<4)return false;
+  return rwLev(x,y)<=(Math.max(x.length,y.length)>=8?2:1);
+}
+function rwLoc(name){            // the place part: text after the last " at "
+  var s=String(name||"").toLowerCase().replace(/\(.*?\)/g," ");
+  var i=s.lastIndexOf(" at ");
+  return i>=0?rwNorm(s.slice(i+4)):"";
+}
+function rwScore(a,b,la,lb){
   if(!a||!b)return 0;
   if(a===b)return 1;
-  var ta=a.split(" "),tb=b.split(" ");
-  var sa=" "+a+" ",sb=" "+b+" ";
-  if(sa.indexOf(sb)>=0||sb.indexOf(sa)>=0)return .85;   // whole-word containment only
+  var ta=a.split(" ").filter(function(t){return t.length>2;}),tb=b.split(" ").filter(function(t){return t.length>2;});
+  if(!ta.length||!tb.length)return 0;
   var hit=0;
-  ta.forEach(function(t){if(t.length>2&&tb.indexOf(t)>=0)hit++;});
-  return hit/Math.max(ta.length,tb.length);
+  ta.forEach(function(t){if(tb.some(function(u){return rwTokEq(t,u);}))hit++;});
+  var sc=hit/Math.max(ta.length,tb.length);
+  var pa=(la||a).split(" ").filter(function(t){return t.length>2;}),pb=(lb||b).split(" ").filter(function(t){return t.length>2;});
+  var placeHits=pa.filter(function(t){return pb.some(function(u){return rwTokEq(t,u);});}).length;
+  if(la&&lb&&!placeHits)sc*=0.3;   // both have a place name: the place must match
+  return sc+0.05*placeHits;        // more matching place words = better
+}
+function rwIdxNorm(v){
+  v=String(v||"").trim();if(!v)return "";
+  var n=parseFloat(v);return isNaN(n)?v.toLowerCase():String(n);
+}
+/* best feed match for one of your stations: 1) same station number  2) saved choice  3) name */
+function rwBestMatch(stn,feed,savedTitle){
+  var no=rwIdxNorm(stn.no);
+  if(no){for(var i=0;i<feed.length;i++){if(feed[i].idx&&rwIdxNorm(feed[i].idx)===no)return i;}}
+  if(savedTitle){for(var j=0;j<feed.length;j++){if(feed[j].title===savedTitle)return j;}}
+  var n=rwNorm(stn.name),ln=rwLoc(stn.name),best=-1,bestSc=0;
+  feed.forEach(function(f,fi){
+    if(f._n===undefined){f._n=rwNorm(f.title);f._l=rwLoc(f.title);}
+    var sc=rwScore(n,f._n,ln,f._l);if(sc>bestSc){bestSc=sc;best=fi;}
+  });
+  return bestSc>=0.6?best:-1;
+}
+/* ── Smart matching model (runs in the browser, no outside AI service) ──
+   Combines: station number · word match (spelling-tolerant) · character
+   trigram similarity (TF-IDF style) · place-name agreement · learned
+   word corrections from matches you confirmed earlier.                    */
+function rwAliases(){return lGet("rls_rw_alias")||{};}
+function rwApplyAlias(norm,al){
+  return norm.split(" ").map(function(t){return al[t]||t;}).join(" ");
+}
+function rwGrams(s){
+  s=" "+s+" ";var g={};
+  for(var i=0;i<s.length-2;i++){var k=s.substr(i,3);g[k]=(g[k]||0)+1;}
+  return g;
+}
+var _rwIdf=null,_rwIdfFeed=null;
+function rwBuildIdf(feed){
+  if(_rwIdfFeed===feed)return;
+  var df={},N=feed.length||1;
+  feed.forEach(function(f){
+    if(f._n===undefined){f._n=rwNorm(f.title);f._l=rwLoc(f.title);}
+    f._g=rwGrams(f._n);Object.keys(f._g).forEach(function(k){df[k]=(df[k]||0)+1;});
+  });
+  _rwIdf={};Object.keys(df).forEach(function(k){_rwIdf[k]=Math.log(1+N/df[k]);});
+  _rwIdfFeed=feed;
+}
+function rwCos(ga,gb){
+  var mx=Math.log(1+((_rwIdfFeed&&_rwIdfFeed.length)||1)),dot=0,na=0,nb=0,k,w;
+  var idf=function(k){return _rwIdf[k]||mx;};
+  for(k in ga){w=idf(k)*ga[k];na+=w*w;if(gb[k])dot+=w*idf(k)*gb[k];}
+  for(k in gb){w=idf(k)*gb[k];nb+=w*w;}
+  return (na&&nb)?dot/Math.sqrt(na*nb):0;
+}
+/* returns candidates sorted best first: [{i, pct, why}] */
+function rwRank(stn,feed,savedTitle){
+  rwBuildIdf(feed);
+  var out=[],no=rwIdxNorm(stn.no),al=rwAliases();
+  var n=rwApplyAlias(rwNorm(stn.name),al),ln=rwApplyAlias(rwLoc(stn.name),al),gn=rwGrams(n);
+  feed.forEach(function(f,fi){
+    var why,p;
+    if(no&&f.idx&&rwIdxNorm(f.idx)===no){p=100;why="same station number";}
+    else if(savedTitle&&f.title===savedTitle){p=99;why="your saved match";}
+    else{
+      var w=Math.min(1,rwScore(n,f._n,ln,f._l));      // word / place model
+      var c=rwCos(gn,f._g);                          // character model
+      p=Math.min(97,Math.round(100*(0.6*w+0.4*c)));
+      if(ln&&f._l&&rwScore(ln,f._l)===0)p=Math.min(p,45);  // different place: never "likely"
+      why="name similarity";
+    }
+    if(p>=25)out.push({i:fi,pct:p,why:why});
+  });
+  out.sort(function(a,b){return b.pct-a.pct;});
+  return out;
+}
+function rwConfLabel(c){
+  if(!c)return {t:"no match found",cls:"none"};
+  if(c.pct>=99)return {t:"✓ "+c.why,cls:"sure"};
+  if(c.pct>=80)return {t:"Likely match · "+c.pct+"%",cls:"likely"};
+  if(c.pct>=55)return {t:"Possible match · "+c.pct+"% — please check",cls:"maybe"};
+  return {t:"Weak guess · "+c.pct+"% — probably not this",cls:"weak"};
+}
+/* learn spelling corrections from a confirmed pair (your name -> feed name) */
+function rwLearn(stnName,feedTitle){
+  var al=rwAliases(),a=rwNorm(stnName).split(" "),b=rwNorm(feedTitle).split(" "),ch=false;
+  a.forEach(function(t){
+    if(t.length<4||b.indexOf(t)>=0)return;
+    var best=null,bd=9;
+    b.forEach(function(u){if(u.length<4)return;var d=rwLev(t,u);if(d<bd){bd=d;best=u;}});
+    if(best&&bd<=3&&bd<Math.max(t.length,best.length)/2&&al[t]!==best){al[t]=best;ch=true;}
+  });
+  if(ch)lSet("rls_rw_alias",al);
 }
 function rwHoursAgo(iso){
   if(!iso)return null;
@@ -2203,34 +2312,51 @@ function openRiverWatchSync(){
     ])]));
     var tb=el("tbody");
     stns.forEach(function(stn){
-      var best=-1,bestSc=0;
-      var savedTitle=savedMap[stn.id];
-      if(savedTitle){
-        feed.forEach(function(f,fi){if(f.title===savedTitle)best=fi;});
-      }
-      if(best<0){
-        var n=rwNorm(stn.name);
-        feedNorm.forEach(function(fn,fi){var sc=rwScore(n,fn);if(sc>bestSc){bestSc=sc;best=fi;}});
-        if(bestSc<0.5)best=-1;
-      }
-      var inc=document.createElement("input");inc.type="checkbox";inc.checked=best>=0;
+      var ranked=rwRank(stn,feed,savedMap[stn.id]);
+      var top=ranked[0]||null;
+      var best=(top&&top.pct>=55)?top.i:-1;           // pre-select possible or better
+      var pctOf={};ranked.forEach(function(r){pctOf[r.i]=r;});
+      var inc=document.createElement("input");inc.type="checkbox";inc.checked=!!(top&&top.pct>=80); // tick only likely+
       var sel=document.createElement("select");sel.className="rw-sel";
       var opNone=document.createElement("option");opNone.value="-1";opNone.textContent="— not on River Watch —";
       sel.appendChild(opNone);
+      var fmt=function(f){return (f.idx?f.idx+" · ":"")+f.title;};
+      var sug=ranked.slice(0,5);
+      if(sug.length){
+        var g1=document.createElement("optgroup");g1.label="🤖 Suggested matches";
+        sug.forEach(function(r){
+          var op=document.createElement("option");op.value=String(r.i);
+          op.textContent=fmt(feed[r.i])+"  ("+(r.pct>=99?r.why:r.pct+"%")+")";
+          if(r.i===best)op.selected=true;g1.appendChild(op);
+        });
+        sel.appendChild(g1);
+      }
+      var g2=document.createElement("optgroup");g2.label="All stations";
+      var inSug={};sug.forEach(function(r){inSug[r.i]=1;});
       feed.forEach(function(f,fi){
-        var op=document.createElement("option");op.value=String(fi);op.textContent=f.title;
-        if(fi===best)op.selected=true;sel.appendChild(op);
+        if(inSug[fi])return;
+        var op=document.createElement("option");op.value=String(fi);op.textContent=fmt(f);
+        if(fi===best)op.selected=true;g2.appendChild(op);
       });
+      sel.appendChild(g2);
+      var conf=el("div",{cls:"rw-conf"});
+      var showConf=function(){
+        var v=parseInt(sel.value),c=v>=0?(pctOf[v]||{pct:0,why:"your choice"}):null;
+        if(v>=0&&c.pct===0){conf.className="rw-conf sure";conf.textContent="✓ chosen by you";return;}
+        var L=v>=0?rwConfLabel(c):(top?{t:"🤖 Maybe: "+fmt(feed[top.i])+" ("+top.pct+"%)",cls:"weak"}:rwConfLabel(null));
+        conf.className="rw-conf "+L.cls;conf.textContent=L.t;
+      };
+      showConf();
       var lastTd=el("td",{cls:"rw-lastdata"});
       var propTd=el("td");
       var row={stn:stn,inc:inc,sel:sel,lastTd:lastTd,propTd:propTd};
       rows.push(row);
-      sel.onchange=function(){inc.checked=parseInt(sel.value)>=0;refresh();};
+      sel.onchange=function(){inc.checked=parseInt(sel.value)>=0;showConf();refresh();};
       inc.onchange=refresh;
       tb.appendChild(el("tr",[
         el("td",[inc]),
         el("td",[el("b",[stn.no?stn.no+" ":""]) ,txt(stn.name)]),
-        el("td",[sel]),lastTd,propTd
+        el("td",[sel,conf]),lastTd,propTd
       ]));
     });
     tbl.appendChild(tb);
@@ -2301,6 +2427,7 @@ function openRiverWatchSync(){
       rows.forEach(function(row){
         var fi=parseInt(row.sel.value);
         mp[row.stn.id]=fi>=0?feed[fi].title:"";
+        if(fi>=0&&row.inc.checked)rwLearn(row.stn.name,feed[fi].title);   // learn from confirmed matches
         var p=proposed(row);
         if(!p){nSkip++;return;}
         if(!S.status[k][row.stn.id])S.status[k][row.stn.id]={};
@@ -2864,7 +2991,10 @@ function runAutoStatus(){
   var auto=lGet(autoKey(k))||{};
   var changed=0;
   stns.forEach(function(stn){
-    var f=byTitle[mp[stn.id]];if(!f)return;
+    var f=null,no=rwIdxNorm(stn.no);
+    if(no)f=feed.filter(function(x){return x.idx&&rwIdxNorm(x.idx)===no;})[0]||null;   // same station number
+    if(!f&&mp[stn.id])f=byTitle[mp[stn.id]]||null;                                     // or your saved match
+    if(!f)return;
     var h=rwHoursAgo(f.when);
     var v=(h!=null&&h<=AUTO_HOURS)?"A":"I";
     if(!st[stn.id])st[stn.id]={};
