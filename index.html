@@ -2077,8 +2077,10 @@ function hyValue(x){
 
 function hyFeed(){
   var byTitle={};
+  var waterSub=!/aws|glacier|camera/i.test(S.subtype||"");   // Hydrological, Flood, Snow RLS = water level
   Object.keys(HY_EVENTS).forEach(function(ev){
     var rain=/rain/i.test(ev);
+    if(waterSub&&rain)return;   // water level stations never match rainfall stations
     HY_EVENTS[ev].forEach(function(x){
       if(x.properties&&!x.name)x=Object.assign({},x.properties,x);
       var t=String(x.name||x.title||"").trim();if(!t)return;
@@ -2117,8 +2119,10 @@ function rwNorm(s){
 function rwScore(a,b){
   if(!a||!b)return 0;
   if(a===b)return 1;
-  if(a.indexOf(b)>=0||b.indexOf(a)>=0)return .85;
-  var ta=a.split(" "),tb=b.split(" "),hit=0;
+  var ta=a.split(" "),tb=b.split(" ");
+  var sa=" "+a+" ",sb=" "+b+" ";
+  if(sa.indexOf(sb)>=0||sb.indexOf(sa)>=0)return .85;   // whole-word containment only
+  var hit=0;
   ta.forEach(function(t){if(t.length>2&&tb.indexOf(t)>=0)hit++;});
   return hit/Math.max(ta.length,tb.length);
 }
