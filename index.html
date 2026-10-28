@@ -2034,6 +2034,8 @@ function hyConnect(){
         console.log("[hydrology.gov.np] event:",a[0],list?list.length+" items":"(format: "+(typeof a[1])+")",list?"":a[1]);
         if(typeof a[0]==="string"&&list&&list.length){
           HY_EVENTS[a[0]]=list;HY_LAST=Date.now();
+          var withTime=list.filter(function(x){return hyTime(x.properties?Object.assign({},x.properties,x):x);}).length;
+          console.log("[hydrology.gov.np]   "+a[0]+": "+withTime+" of "+list.length+" have a report time. Fields:",Object.keys(list[0]).join(", "));
         }
       }catch(e){console.warn("[hydrology.gov.np] parse error",e);}
       _oe.call(this,pkt);
@@ -2042,7 +2044,7 @@ function hyConnect(){
 }
 
 /* ask the server for the station lists (same messages hydrology.gov.np sends) */
-var HY_LISTS=["rainfall_watch","river_discharge","river_watch"];
+var HY_LISTS=["rainfall_watch","river_discharge","river_test"];   // river_test = water level list
 function hyRequest(){
   if(!_hySock||!_hySock.connected)return;
   HY_LISTS.forEach(function(n){_hySock.emit("client_request",n);});
