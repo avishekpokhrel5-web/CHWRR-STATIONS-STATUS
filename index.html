@@ -1996,35 +1996,45 @@ function renderSummary(app){
 }
 
 /* ════════════════════════════════════════
-   RIVER WATCH SYNC (live CHWRR data via BIPAD open API)
+   RIVER WATCH SYNC (live CHWRR data from hydrology.gov.np)
 ════════════════════════════════════════ */
-var RW_API="https://bipadportal.gov.np/api/v1/river/?format=json&limit=-1";
 
 function rwMapKey(){return "rls_rwmap_"+sk(S.office)+"_"+sk(S.subtype);}
 
-/* ── Live station feed ──
-   1st choice: CHWRR hydrology.gov.np (socket.io, public, CORS open)
-   Fallback:   BIPAD river API (old method)                          */
+/* ── Live station feed: CHWRR hydrology.gov.np only (public socket.io) ── */
 var HY_EVENTS={};          // event name -> array of stations
 var HY_LAST=0;             // time we last received data
+var HY_STATE="not started";
 var _hySock=null;
 
 function hyConnect(){
-  if(_hySock||typeof io==="undefined")return;
+  if(_hySock)return;
+  if(typeof io==="undefined"){HY_STATE="socket.io library did not load";return;}
   try{
-    _hySock=io("https://hydrology.gov.np",{path:"/gss/socket.io",transports:["polling","websocket"],reconnection:true});
+    HY_STATE="connecting";
+    _hySock=io("https://hydrology.gov.np",{
+      path:"/gss/socket.io",
+      transports:["polling"],     // same method hydrology.gov.np itself uses
+      upgrade:false,
+      withCredentials:false,      // needed: server allows any site, but without cookies
+      reconnection:true,
+      timeout:20000
+    });
+    _hySock.on("connect",function(){HY_STATE="connected";console.log("[hydrology.gov.np] connected");});
+    _hySock.on("connect_error",function(e){HY_STATE="connection error: "+((e&&e.message)||e);console.warn("[hydrology.gov.np]",HY_STATE);});
+    _hySock.on("disconnect",function(r){HY_STATE="disconnected ("+r+")";});
     var _oe=_hySock.onevent;
     _hySock.onevent=function(pkt){        // catch every event the server sends
       try{
         var a=pkt.data||[];
+        console.log("[hydrology.gov.np] event:",a[0],Array.isArray(a[1])?a[1].length+" items":"");
         if(typeof a[0]==="string"&&Array.isArray(a[1])&&a[1].length&&typeof a[1][0]==="object"){
           HY_EVENTS[a[0]]=a[1];HY_LAST=Date.now();
-          console.log("[hydrology.gov.np] "+a[0]+": "+a[1].length+" stations");
         }
       }catch(e){}
       _oe.call(this,pkt);
     };
-  }catch(e){console.warn("hydrology socket failed",e);}
+  }catch(e){HY_STATE="failed: "+e.message;console.warn("hydrology socket failed",e);}
 }
 
 function hyTime(x){
@@ -2037,12 +2047,9 @@ function hyValue(x){
 }
 
 function hyFeed(){
-  var isRiverSub=/hydro|flood/i.test(S.subtype||"");
-  var byTitle={},anyRiver=false;
-  Object.keys(HY_EVENTS).forEach(function(ev){if(!/rain/i.test(ev))anyRiver=true;});
+  var byTitle={};
   Object.keys(HY_EVENTS).forEach(function(ev){
     var rain=/rain/i.test(ev);
-    if(isRiverSub&&anyRiver&&rain)return;      // river subtypes: use river data only
     HY_EVENTS[ev].forEach(function(x){
       var t=String(x.name||x.title||"").trim();if(!t)return;
       var title=(rain&&!/rain/i.test(t))?t+" (rainfall)":t;
@@ -2059,49 +2066,13 @@ function rwFetch(cb){
   var waited=0;
   (function wait(){
     var f=hyFeed();
-    // give the server a few seconds to send all its lists
-    if(f.length>=10&&Date.now()-HY_LAST>3000){cb(f,null);return;}
-    if(waited>=15000||typeof io==="undefined"){
-      if(f.length>=10)cb(f,null);else bipadFetch(cb);   // fallback to BIPAD
+    if(f.length>0&&Date.now()-HY_LAST>3000){cb(f,null);return;}   // let all lists arrive
+    if(waited>=25000){
+      if(f.length>0)cb(f,null);
+      else cb(null,"Could not get data from hydrology.gov.np (status: "+HY_STATE+"). Check your internet, then try again. If it keeps failing, press F12 → Console and send a screenshot.");
       return;
     }
     waited+=500;setTimeout(wait,500);
-  })();
-}
-
-function bipadFetch(cb){
-
-  // Try direct first; if browser CORS blocks it, fall back to public CORS proxies.
-  var tries=[
-    RW_API,
-    "https://api.allorigins.win/raw?url="+encodeURIComponent(RW_API),
-    "https://corsproxy.io/?url="+encodeURIComponent(RW_API)
-  ];
-  var i=0;
-  (function next(){
-    if(i>=tries.length){cb(null,"Could not reach the River Watch data feed. This can happen if the CHWRR/BIPAD server is down, or the network blocks it. Please try again later.");return;}
-    var u=tries[i++];
-    fetch(u,{method:"GET"})
-      .then(function(r){if(!r.ok)throw 0;return r.json();})
-      .then(function(j){
-        var list=(j&&(j.results||j.data))||(Array.isArray(j)?j:[]);
-        if(!Array.isArray(list)||list.length===0)throw 0;
-        var out=list.map(function(r){
-          var wl=r.waterLevel||r.water_level||null;
-          return{
-            id:r.id,
-            title:String(r.title||r.name||"").trim(),
-            basin:r.basin||"",
-            status:r.status||"",
-            value:(wl&&wl.value!=null)?wl.value:null,
-            when:(wl&&(wl.datetime||wl.dateTime||wl.date))||r.modifiedOn||r.createdOn||null
-          };
-        }).filter(function(x){return x.title;});
-        if(out.length===0)throw 0;
-        out.sort(function(a,b){return a.title<b.title?-1:1;});
-        cb(out,null);
-      })
-      .catch(function(){next();});
   })();
 }
 
@@ -2139,7 +2110,7 @@ function openRiverWatchSync(){
   var modal=document.createElement("div");modal.className="rw-modal";
   var hdr=document.createElement("div");hdr.className="lock-modal-hdr";
   hdr.innerHTML='<span class="icon">🌐</span><div><div class="ttl">River Watch Sync — live station status</div>'+
-    '<div class="sub">CHWRR real-time river data (via BIPAD open API) · '+S.office+' / '+S.subtype+'</div></div>';
+    '<div class="sub">CHWRR real-time data (hydrology.gov.np) · '+S.office+' / '+S.subtype+'</div></div>';
   var body=document.createElement("div");body.className="rw-body";
   body.innerHTML='<div class="rw-loading">⏳ Fetching live data from River Watch feed…</div>';
   var foot=document.createElement("div");foot.className="lock-modal-foot";
