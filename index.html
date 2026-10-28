@@ -2020,7 +2020,10 @@ function hyConnect(){
       reconnection:true,
       timeout:20000
     });
-    _hySock.on("connect",function(){HY_STATE="connected";console.log("[hydrology.gov.np] connected");});
+    _hySock.on("connect",function(){
+      HY_STATE="connected";console.log("[hydrology.gov.np] connected");
+      hyRequest();
+    });
     _hySock.on("connect_error",function(e){HY_STATE="connection error: "+((e&&e.message)||e);console.warn("[hydrology.gov.np]",HY_STATE);});
     _hySock.on("disconnect",function(r){HY_STATE="disconnected ("+r+")";});
     var _oe=_hySock.onevent;
@@ -2036,6 +2039,14 @@ function hyConnect(){
     };
   }catch(e){HY_STATE="failed: "+e.message;console.warn("hydrology socket failed",e);}
 }
+
+/* ask the server for the station lists (same messages hydrology.gov.np sends) */
+var HY_LISTS=["rainfall_watch","river_discharge","river_watch"];
+function hyRequest(){
+  if(!_hySock||!_hySock.connected)return;
+  HY_LISTS.forEach(function(n){_hySock.emit("client_request",n);});
+}
+setInterval(hyRequest,5*60*1000);   // refresh lists every 5 minutes
 
 function hyTime(x){
   var o=x.latest_observation||x.latestObservation||x.waterLevel||x.water_level||x.observation||{};
